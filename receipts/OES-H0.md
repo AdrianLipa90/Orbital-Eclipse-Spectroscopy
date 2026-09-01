@@ -2,7 +2,13 @@
 
 Date: 2026-09-01
 Branch: `oes-h0-hydrogen-closure-20260901`
-Status: OPEN_PENDING_CI
+Status: PARTIAL_PASS__H0_OPEN
+
+## Hosted validation already observed
+
+- Head `dcbe7536d67a481a28fde2ffca53fd9e61776e1d`: `OES reference suite` SUCCESS, run `33527502380`.
+- Head `f1cfc1b808e03857dc500c10562a8591790fdb2e`: `OES reference suite` SUCCESS, run `33527782318`.
+- Current radial-extension head requires its own exact-head CI before promotion.
 
 ## Implemented checks
 
@@ -17,15 +23,26 @@ Status: OPEN_PENDING_CI
 9. Orbital m-resolved flavor count `3[n_f^2+(n_f-1)^2]`.
 10. Lande factors for `s_1/2`, `p_1/2`, `p_3/2` in the LS approximation.
 11. Linear Zeeman flavor-to-color shift.
+12. Reduced-mass Dirac bound-energy reference solver.
+13. NIST H I 2p fine-structure held-out benchmark; no benchmark value is a solver input.
+14. Continuous p-state Zeeman -> Paschen-Back diagonalization.
+15. Hydrogenic normalized radial functions.
+16. Signed E1 radial overlap, absolute overlap and cancellation coherence.
+17. Exact `2p->1s` radial dipole integral gate.
+18. Distinct H-alpha radial-flavor gates for `3s->2p`, `3p->2s`, `3d->2p`.
 
 ## Gates
 
-- H0.1 Gross spectrum: IMPLEMENTED / CI PENDING
-- H0.2 Orbital flavor geometry: PARTIAL / CI PENDING
-- H0.3 Fine structure + Lamb/contact: CONTACT IMPLEMENTED; FULL RELATIVISTIC/QED OPEN
-- H0.4 Zeeman -> Paschen-Back: LINEAR ZEEMAN IMPLEMENTED; PASCHEN-BACK OPEN
-- Empirical held-out benchmark: OPEN
+- H0.1 Gross spectrum: PASS.
+- H0.2 Orbital flavor geometry: IMPLEMENTED; current exact-head CI pending after radial extension.
+- H0.3 Fine structure + Lamb/contact: DIRAC REFERENCE + CONTACT PASS; FULL LAMB/QED OPEN.
+- H0.4 Zeeman -> Paschen-Back: IMPLEMENTED; current exact-head CI pending after radial extension.
+- Empirical benchmark: PARTIAL PASS (NIST 2p fine split); broad held-out level/line suite OPEN.
+
+## Fine-structure benchmark
+
+Reduced-mass Dirac prediction for the H I `2p_1/2`/`2p_3/2` split is approximately `10.943683 GHz`. The locked NIST ASD target is `10.969051 GHz`, a relative discrepancy of about `0.23%`. The residual is not silently absorbed: recoil/QED refinements remain outside this reference Dirac gate.
 
 ## Promotion rule
 
-This receipt becomes PASS only after repository-hosted CI executes the exact branch head successfully. Full OES-H0 closure remains OPEN until the declared OPEN gates are implemented and separately validated.
+Full OES-H0 closure remains OPEN until the exact current head passes hosted CI and the declared full Lamb/QED gate plus broader empirical benchmark are separately resolved. Passing analytic/Dirac/radial gates does not promote the OPEN QED claim.
