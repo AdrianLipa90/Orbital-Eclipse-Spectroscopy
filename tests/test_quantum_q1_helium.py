@@ -1,8 +1,10 @@
+import importlib.util
 import unittest
 
 from oes.quantum.helium_q1 import run_helium_q1
 
 
+@unittest.skipUnless(importlib.util.find_spec("pyscf") is not None, "requires OES q1 extra: pyscf")
 class TestQuantumHeliumQ1(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
