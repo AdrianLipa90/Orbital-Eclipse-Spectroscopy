@@ -10,20 +10,20 @@ The executable reference layer currently includes:
 - orbital E1 channel geometry,
 - radial-node structure,
 - central and contact exposure kernels,
-- reduced-mass Dirac fine-structure reference energies,
-- locked NIST H I fine-structure benchmark targets,
-- weak-field Zeeman flavor-to-color conversion,
-- continuous p-state Zeeman → Paschen–Back crossover,
 - normalized hydrogen radial functions,
 - signed/unsigned E1 radial overlaps and cancellation coherence,
+- reduced-mass Dirac fine-structure reference energies,
+- locked NIST H I `np` fine-structure benchmarks for `n=2..5`,
+- weak-field Zeeman flavor-to-color conversion,
+- continuous p-state Zeeman → Paschen–Back crossover,
 - leading low-Z `2S-2P1/2` QED reference from A41/A40 self-energy plus leading Uehling vacuum polarization.
 
-The gross and reference QED solvers take physical constants, quantum numbers and declared theoretical coefficients as inputs. Empirical spectral data live in benchmark fixtures and remain outside solver input paths.
+Solver inputs are physical constants, quantum numbers and declared theoretical coefficients. Empirical spectral data live in benchmark fixtures and remain outside solver input paths.
 
 The executable code is in `oes/`, formal definitions are in `formalism/`, held-out targets are in `benchmarks/`, and validation state is recorded in `receipts/`.
 
 ## Current status
 
-Hosted CI has validated the gross, flavor, Dirac, magnetic and radial reference layers on exact branch heads. The current leading-QED extension is undergoing its own exact-head validation.
+Hosted CI has validated the gross, flavor, radial, Dirac, magnetic, leading-QED and `np` fine-series reference gates on exact branch heads.
 
-Complete QED closure and a broader held-out hydrogen level/line benchmark remain explicit OPEN gates.
+Complete higher-order QED closure and a broad hydrogen line/intensity benchmark remain explicit OPEN gates.
