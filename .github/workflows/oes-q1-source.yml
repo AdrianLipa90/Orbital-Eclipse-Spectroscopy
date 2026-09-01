@@ -102,3 +102,16 @@ jobs:
         run: python -m pip install -e '.[q1]'
       - name: Test complete-class rotation-covariant external natural-orbital bath
         run: python scripts/run_q1_daug_natural_orbital_bath.py
+
+  helium-feshbach-20q:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Q1 dependencies
+        run: python -m pip install -e '.[q1]'
+      - name: Eliminate symmetry-preserving bath back to exact 190D fixed-20Q sector
+        run: python scripts/run_q1_feshbach_20q.py
