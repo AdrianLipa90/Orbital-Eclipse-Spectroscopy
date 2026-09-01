@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Dress the predictive d-aug s4+p6 20Q states with parameter-free EN2 Q-space energy corrections."""
+"""Dress predictive d-aug s4+p6 20Q states with parameter-free Q-space EN2.
+
+Isolated levels use state-specific EN2. The triply-degenerate bright 1P manifold
+uses a basis-invariant quasi-degenerate EN2 block; its raw block splitting is a
+fail-closed diagnostic of the diagonal-Q approximation rather than something we
+hide with a looser tolerance.
+"""
 
 import json
 from pathlib import Path
@@ -12,6 +18,7 @@ from oes.quantum.external_dressing import (
     build_external_coupling_space,
     complete_mo_basis_preserving_active,
     en2_correction,
+    en2_degenerate_block,
 )
 from oes.quantum.fermions import build_sector_hamiltonian, transition_one_rdm
 from oes.quantum.helium_q1 import classify_states, spatial_transition_rdm, spin_squared_matrix
@@ -24,6 +31,7 @@ SOURCE = {
     "dark": 20.61327300402567,
     "bright": 21.29949008913645,
 }
+BRIGHT_SPREAD_GATE_EV = 1e-4
 
 
 def main():
@@ -87,16 +95,13 @@ def main():
         ecore=float(mol.energy_nuc()),
     )
 
-    selected = {
+    selected_single = {
         "ground": 0,
         "triplet": triplet.index,
         "dark": dark.index,
-        "bright_0": bright_manifold[0].index,
-        "bright_1": bright_manifold[1].index,
-        "bright_2": bright_manifold[2].index,
     }
     dressed = {}
-    for name, idx in selected.items():
+    for name, idx in selected_single.items():
         diag = en2_correction(float(evals[idx]), evecs[:, idx], external, denominator_floor=1e-5)
         dressed[name] = {
             **diag,
@@ -104,17 +109,33 @@ def main():
             "dressed_energy_hartree": float(evals[idx] + diag["correction_hartree"]),
         }
 
+    bright_indices = [state.index for state in bright_manifold]
+    bright_active_energies = np.array([float(evals[idx]) for idx in bright_indices])
+    bright_reference_energy = float(np.mean(bright_active_energies))
+    bright_states = np.column_stack([evecs[:, idx] for idx in bright_indices])
+    bright_block = en2_degenerate_block(
+        bright_reference_energy,
+        bright_states,
+        external,
+        denominator_floor=1e-5,
+    )
+    bright_corrections = np.asarray(bright_block["correction_eigenvalues_hartree"], dtype=float)
+    bright_block_dressed_energies = bright_reference_energy + bright_corrections
+    bright_projected_energy = bright_reference_energy + float(bright_block["mean_correction_hartree"])
+
     dressed_ground = dressed["ground"]["dressed_energy_hartree"]
     active_ground = float(evals[0])
+
     def excitation(name):
         return (dressed[name]["dressed_energy_hartree"] - dressed_ground) * HARTREE_TO_EV
+
     def active_excitation(name):
         return (dressed[name]["active_energy_hartree"] - active_ground) * HARTREE_TO_EV
 
-    bright_dressed = [excitation(f"bright_{i}") for i in range(3)]
-    bright_active = [active_excitation(f"bright_{i}") for i in range(3)]
-    if max(bright_dressed) - min(bright_dressed) > 1e-4:
-        raise RuntimeError(f"EN2 dressing broke bright degeneracy: spread={max(bright_dressed)-min(bright_dressed)} eV")
+    bright_active_eV = (bright_reference_energy - active_ground) * HARTREE_TO_EV
+    bright_raw_dressed_eV = (bright_block_dressed_energies - dressed_ground) * HARTREE_TO_EV
+    bright_projected_dressed_eV = (bright_projected_energy - dressed_ground) * HARTREE_TO_EV
+    bright_raw_spread_eV = float(np.max(bright_raw_dressed_eV) - np.min(bright_raw_dressed_eV))
 
     classes = {
         "triplet": {
@@ -130,11 +151,14 @@ def main():
             "nist_eV": TARGETS["1s2s_1S0"],
         },
         "bright": {
-            "active_eV": float(np.mean(bright_active)),
-            "dressed_eV": float(np.mean(bright_dressed)),
+            "active_eV": float(bright_active_eV),
+            # For color metrics use the symmetry-projected trace/3 correction;
+            # raw block eigenvalues and their spread remain explicit below.
+            "dressed_eV": float(bright_projected_dressed_eV),
             "source_eV": SOURCE["bright"],
             "nist_eV": TARGETS["1s2p_1P1"],
-            "dressed_manifold_spread_eV": float(max(bright_dressed) - min(bright_dressed)),
+            "raw_block_dressed_eV": [float(x) for x in bright_raw_dressed_eV],
+            "raw_block_spread_eV": bright_raw_spread_eV,
         },
     }
     for item in classes.values():
@@ -150,13 +174,14 @@ def main():
 
     payload = {
         "backend": "SIMULATED_REFERENCE",
-        "status_semantics": "PARAMETER_FREE_EXTERNAL_SPACE_EN2_DIAGNOSTIC",
+        "status_semantics": "PARAMETER_FREE_QUASI_DEGENERATE_EXTERNAL_SPACE_EN2_DIAGNOSTIC",
         "active_protocol": receipt.protocol,
         "n_active_spin_orbitals": 20,
         "n_source_spin_orbitals": 2 * nfull,
         "external_determinants": len(external.external_basis),
         "classes": classes,
-        "state_corrections": dressed,
+        "single_state_corrections": dressed,
+        "bright_block_correction": bright_block,
         "metrics": {
             "active_source_rms_eV": float(np.sqrt(np.mean(active_source**2))),
             "dressed_source_rms_eV": float(np.sqrt(np.mean(dressed_source**2))),
@@ -164,9 +189,16 @@ def main():
             "dressed_source_centered_rms_eV": float(np.sqrt(np.mean((dressed_source - np.mean(dressed_source))**2))),
             "active_nist_rms_eV": float(np.sqrt(np.mean(active_nist**2))),
             "dressed_nist_rms_eV": float(np.sqrt(np.mean(dressed_nist**2))),
+            "bright_raw_block_spread_eV": bright_raw_spread_eV,
         },
     }
     print(json.dumps(payload, indent=2, sort_keys=True))
+
+    if bright_raw_spread_eV > BRIGHT_SPREAD_GATE_EV:
+        raise RuntimeError(
+            "quasi-degenerate EN2 diagonal-Q block violates bright rotational degeneracy: "
+            f"spread={bright_raw_spread_eV} eV > {BRIGHT_SPREAD_GATE_EV} eV"
+        )
 
 
 if __name__ == "__main__":
