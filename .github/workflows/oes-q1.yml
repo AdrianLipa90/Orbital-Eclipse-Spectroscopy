@@ -31,3 +31,5 @@ jobs:
         run: python scripts/run_q1_taas_v2.py
       - name: Evaluate non-predictive oracle 20Q capacity upper bound
         run: python scripts/run_q1_oracle_capacity.py
+      - name: Diagnose aug versus geometric d-aug full source spectrum
+        run: python scripts/run_q1_diffuse_source.py
