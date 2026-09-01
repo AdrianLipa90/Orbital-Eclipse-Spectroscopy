@@ -1,0 +1,12 @@
+{
+  "source": "NIST Atomic Spectra Database / NIST lithium holdings",
+  "asd_version": "5.12",
+  "retrieved_context_date": "2026-09-02",
+  "neutral_lithium": {
+    "ground_configuration": "1s^2 2s",
+    "ground_term": "2S_1/2",
+    "ionization_energy_eV": 5.391714996,
+    "first_2s_2p_excitation_eV": 1.8478
+  },
+  "usage": "Benchmark outputs only. These values do not enter active-space construction or Hamiltonian fitting."
+}
