@@ -1,12 +1,15 @@
 {
-  "source": "NIST Atomic Spectra Database / NIST lithium holdings",
+  "source": "NIST Atomic Spectra Database / NIST lithium holdings and persistent Li I lines",
   "asd_version": "5.12",
   "retrieved_context_date": "2026-09-02",
   "neutral_lithium": {
     "ground_configuration": "1s^2 2s",
     "ground_term": "2S_1/2",
     "ionization_energy_eV": 5.391714996,
-    "first_2s_2p_excitation_eV": 1.8478
+    "first_2s_2p_excitation_eV": 1.8478,
+    "d_line_Aki_1e8_s": 0.369,
+    "d_line_wavelengths_angstrom": [6707.775, 6707.926],
+    "d_multiplet_absorption_f_sum_approx": 0.7467372
   },
-  "usage": "Benchmark outputs only. These values do not enter active-space construction or Hamiltonian fitting."
+  "usage": "Benchmark outputs only. These values do not enter active-space construction or Hamiltonian fitting. The f-sum is derived from the two NIST D-line Aki values and statistical weights using the NIST ASD conversion relation."
 }
