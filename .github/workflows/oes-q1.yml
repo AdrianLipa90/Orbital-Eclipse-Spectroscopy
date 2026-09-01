@@ -21,3 +21,5 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_quantum_q1_helium.py' -v
       - name: Emit Q1 numerical receipt
         run: python scripts/run_q1_helium.py
+      - name: Sweep fixed-20Q active spaces against held-out He I levels
+        run: python scripts/sweep_q1_active_space.py
