@@ -4,19 +4,25 @@ Orbital Eclipse Spectroscopy (OES) is a calculation-first repository for represe
 
 Current milestone: **OES-H0 — Hydrogen Orbital-Eclipse Closure**.
 
-The first implementation separates:
+The executable reference layer currently includes:
 
-- gross Coulomb color from `E_i-E_f`,
+- reduced-mass Coulomb gross energies and colors,
 - orbital E1 channel geometry,
 - radial-node structure,
-- central exposure kernels,
-- contact exposure,
-- weak-field Zeeman flavor-to-color conversion.
+- central and contact exposure kernels,
+- reduced-mass Dirac fine-structure reference energies,
+- locked NIST H I fine-structure benchmark targets,
+- weak-field Zeeman flavor-to-color conversion,
+- continuous p-state Zeeman → Paschen–Back crossover,
+- normalized hydrogen radial functions,
+- signed/unsigned E1 radial overlaps and cancellation coherence.
 
-The executable reference code is in `oes/`, the formal definitions are in `formalism/`, and validation state is recorded in `receipts/`.
+The gross solver takes physical constants and quantum numbers as inputs. Empirical spectral data live in benchmark fixtures and remain outside solver input paths.
+
+The executable code is in `oes/`, formal definitions are in `formalism/`, held-out targets are in `benchmarks/`, and validation state is recorded in `receipts/`.
 
 ## Current status
 
-`OES-H0` is under validation. Analytic hydrogen primitives and linear Zeeman mapping are implemented. Full relativistic fine structure, full Lamb/QED treatment, signed radial cancellation/coherence, empirical held-out spectroscopy benchmarking, and the Paschen–Back continuation remain explicit OPEN gates.
+Hosted CI has already validated the gross, flavor, Dirac and magnetic reference layers on earlier exact branch heads. The current radial-extension head is undergoing its own exact-head validation.
 
-No empirical wavelength is used as an input to the gross hydrogen solver.
+Full Lamb/QED closure and a broader held-out hydrogen level/line benchmark remain explicit OPEN gates.
