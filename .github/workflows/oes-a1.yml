@@ -20,3 +20,5 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_*.py'
       - name: Run neutral lithium fixed-20Q three-electron gate
         run: python scripts/run_a1_lithium_20q.py
+      - name: Benchmark Li ionization and D-multiplet strength in fixed 20Q space
+        run: python scripts/run_a1_lithium_ionization.py
