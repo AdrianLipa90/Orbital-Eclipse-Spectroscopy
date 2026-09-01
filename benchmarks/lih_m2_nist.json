@@ -1,0 +1,10 @@
+{
+  "source": "NIST Chemistry WebBook SRD 69, constants of diatomic molecules for 7LiH",
+  "retrieved_context_date": "2026-09-02",
+  "ground_state": "X 1Sigma+",
+  "re_angstrom": 1.5957,
+  "omega_e_cm-1": 1405.65,
+  "B_e_cm-1": 7.5131,
+  "dipole_v0_debye": 5.8820,
+  "usage": "Benchmark outputs only. No listed experimental constant enters active-space selection or Hamiltonian construction. The v=0 dipole is compared diagnostically with the static electronic+nuclear dipole at the benchmark geometry."
+}
