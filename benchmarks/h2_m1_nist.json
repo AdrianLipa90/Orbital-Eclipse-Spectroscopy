@@ -1,0 +1,9 @@
+{
+  "source": "NIST Chemistry WebBook SRD 69, constants of diatomic molecules",
+  "retrieved_context_date": "2026-09-02",
+  "ground_state": "X 1Sigma_g+",
+  "re_angstrom": 0.74144,
+  "omega_e_cm-1": 4401.213,
+  "B_e_cm-1": 60.8530,
+  "usage": "Benchmark outputs only. No listed experimental constant enters orbital selection, Hamiltonian construction, or fitting of electronic parameters."
+}
