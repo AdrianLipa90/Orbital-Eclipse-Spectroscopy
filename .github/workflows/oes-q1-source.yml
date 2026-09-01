@@ -32,3 +32,5 @@ jobs:
         run: python -m pip install -e '.[q1]'
       - name: Compress d-aug source to fixed 20Q and benchmark
         run: python scripts/run_q1_daug_20q.py
+      - name: Hybrid radial plus bright d-aug compression at fixed 20Q
+        run: python scripts/run_q1_daug_hybrid_20q.py
