@@ -1,0 +1,15 @@
+{
+  "source": {
+    "name": "NIST H I energy levels",
+    "accessed": "2026-09-01",
+    "asd_exact_n2_url": "https://physics.nist.gov/cgi-bin/ASD/energy1.pl?conf_out=on&format=0&j_out=on&level_out=on&multiplet_ordered=0&output=0&page_size=15&spectrum=H+I&term_out=on&unc_out=1&units=1",
+    "handbook_url": "https://www.physics.nist.gov/PhysRefData/Handbook/Tables/hydrogentable5_a.htm"
+  },
+  "splittings_GHz": {
+    "2p": 10.9690510301,
+    "3p": 3.2497502446,
+    "4p": 1.3700515331,
+    "5p": 0.7015143519
+  },
+  "use": "held_out_benchmark_only"
+}
