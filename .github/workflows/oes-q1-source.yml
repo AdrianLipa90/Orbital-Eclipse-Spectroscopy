@@ -17,3 +17,5 @@ jobs:
         run: python -m pip install -e '.[q1]'
       - name: Diagnose aug versus geometric d-aug full source spectrum
         run: python scripts/run_q1_diffuse_source.py
+      - name: Resolve d-aug first bright singlet manifold
+        run: python scripts/run_q1_diffuse_manifold.py
