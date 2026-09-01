@@ -19,3 +19,5 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_quantum_q1_core.py' -v
       - name: Run Q1 helium 20Q gate
         run: python -m unittest discover -s tests -p 'test_quantum_q1_helium.py' -v
+      - name: Emit Q1 numerical receipt
+        run: python scripts/run_q1_helium.py
