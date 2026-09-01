@@ -4,12 +4,14 @@ Date: 2026-09-01
 Branch: `oes-h0-hydrogen-closure-20260901`
 Status: PARTIAL_PASS__H0_OPEN
 
-## Hosted validation already observed
+## Hosted validation observed
 
 - Head `dcbe7536d67a481a28fde2ffca53fd9e61776e1d`: `OES reference suite` SUCCESS, run `33527502380`.
 - Head `f1cfc1b808e03857dc500c10562a8591790fdb2e`: `OES reference suite` SUCCESS, run `33527782318`.
 - Head `4caf6658d7c29fcd753ba47478cd1d4fdec44216`: `OES reference suite` SUCCESS, run `33528040198`.
-- Current QED-extension head requires its own exact-head CI before promotion.
+- Head `f35bd6e94694846d1b8cf262616e4dac563d9cc9`: `OES reference suite` SUCCESS, run `33528348741`.
+- Head `e56ecdc9e433c007e754dfd058dfc0d399944b46`: `OES reference suite` SUCCESS, run `33528423230`.
+- This receipt update requires one final exact-head CI run.
 
 ## Implemented checks
 
@@ -25,7 +27,7 @@ Status: PARTIAL_PASS__H0_OPEN
 10. Lande factors for `s_1/2`, `p_1/2`, `p_3/2` in the LS approximation.
 11. Linear Zeeman flavor-to-color shift.
 12. Reduced-mass Dirac bound-energy reference solver.
-13. NIST H I 2p fine-structure held-out benchmark; benchmark values live outside solver paths.
+13. NIST H I `2p` fine-structure held-out benchmark.
 14. Continuous p-state Zeeman -> Paschen-Back diagonalization.
 15. Hydrogenic normalized radial functions.
 16. Signed E1 radial overlap, absolute overlap and cancellation coherence.
@@ -33,18 +35,22 @@ Status: PARTIAL_PASS__H0_OPEN
 18. Distinct H-alpha radial-flavor gates for `3s->2p`, `3p->2s`, `3d->2p`.
 19. Leading one-loop `2S-2P1/2` QED reference: A41/A40 self-energy plus leading Uehling V40.
 20. Locked NIST Lamb-interval benchmark for the leading QED gate.
+21. Held-out NIST `np_1/2-np_3/2` fine-structure series for `n=2..5`.
+22. Unrefitted Dirac series benchmark with per-level relative error below `0.5%`.
+23. Leading `n^-3` fine-structure scaling gate across `n=2..5`.
 
 ## Gates
 
 - H0.1 Gross spectrum: PASS.
-- H0.2 Orbital flavor geometry: PASS on hosted CI through the radial extension.
-- H0.3 Fine structure + Lamb/contact: DIRAC + CONTACT PASS; LEADING ONE-LOOP LAMB IMPLEMENTED; current exact-head CI pending; COMPLETE QED CLOSURE OPEN.
-- H0.4 Zeeman -> Paschen-Back: PASS on hosted CI.
-- Empirical benchmark: PARTIAL PASS (NIST 2p fine split + locked 2S-2P1/2 interval); broad held-out level/line suite OPEN.
+- H0.2 Orbital flavor geometry: PASS.
+- H0.3 Fine structure + Lamb/contact: DIRAC + CONTACT PASS; LEADING ONE-LOOP LAMB PASS at declared `1%` benchmark tolerance; COMPLETE QED CLOSURE OPEN.
+- H0.4 Zeeman -> Paschen-Back: PASS.
+- Empirical fine-structure benchmark: PASS for locked `np`, `n=2..5` series.
+- Broad hydrogen line/intensity benchmark: OPEN.
 
 ## Fine-structure benchmark
 
-Reduced-mass Dirac prediction for the H I `2p_1/2`/`2p_3/2` split is approximately `10.943683 GHz`. The locked NIST ASD target is `10.969051 GHz`, a relative discrepancy of about `0.23%`. The residual remains assigned to recoil/QED refinements outside this compact Dirac gate.
+Reduced-mass Dirac prediction for the H I `2p_1/2`/`2p_3/2` split is approximately `10.943683 GHz`. The locked NIST ASD target is `10.969051 GHz`, a relative discrepancy of about `0.23%`. The `np` series through `n=5` stays within the declared `0.5%` tolerance without per-level refitting.
 
 ## Leading Lamb benchmark
 
@@ -59,4 +65,4 @@ The locked NIST target is `1057.8481 MHz`, leaving a residual of about `7.30 MHz
 
 ## Promotion rule
 
-Full OES-H0 closure remains OPEN until the exact current head passes hosted CI and the complete QED plus broader empirical benchmark gates are resolved independently.
+Full OES-H0 closure remains OPEN until complete QED and the broad hydrogen line/intensity benchmark are resolved independently. Current classical, relativistic, magnetic, radial, leading-QED and `np` fine-series gates have executable coverage.
