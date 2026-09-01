@@ -1,0 +1,21 @@
+name: OES Q1 quantum helium
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  helium-20q:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Q1 dependencies
+        run: python -m pip install -e '.[q1]'
+      - name: Run Q1 core gates
+        run: python -m unittest tests.test_quantum_q1_core -v
+      - name: Run Q1 helium 20Q gate
+        run: python -m unittest tests.test_quantum_q1_helium -v
