@@ -34,3 +34,5 @@ jobs:
         run: python scripts/run_q1_daug_20q.py
       - name: Hybrid radial plus bright d-aug compression at fixed 20Q
         run: python scripts/run_q1_daug_hybrid_20q.py
+      - name: Symmetry-preserving s7+p3 d-aug compression at fixed 20Q
+        run: python scripts/run_q1_daug_sp_20q.py
