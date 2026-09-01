@@ -27,7 +27,8 @@ Backend: `SIMULATED_REFERENCE`
 10. arbitrary selected two-electron determinant Hamiltonian vs canonical sector Hamiltonian — PASS
 11. state-specific EN2 toy model and intruder fail-closed gate — PASS
 12. degenerate EN2 block invariance under active-basis rotation — PASS
-13. H0 regression suite on Q1 head — PASS
+13. complete-class external natural-orbital bath rotation gauge — PASS
+14. H0 regression suite on Q1 head — PASS
 
 These gates validate the simulated-reference implementation. Physical-backend execution remains a separate OPEN gate.
 
@@ -75,7 +76,7 @@ Oracle 20Q results:
 - bright degeneracy: 3
 - bright oscillator-strength sum: 0.33179; 100.75% of the full d-aug source value
 
-Verdict: `20Q_CAPACITY_PASS`. The ten-spatial-orbital budget is sufficient for the tested ground/2s/2p information when the subspace is chosen near-optimally. The oracle is a capacity upper bound and is not promoted as a predictive selector.
+Verdict: `20Q_CAPACITY_PASS`. The ten-spatial-orbital budget is sufficient for the tested ground/2s/2p information when the subspace is chosen near-optimally. The oracle remains a capacity upper bound; predictive selection is handled separately.
 
 ## Predictive symmetry-block active space
 
@@ -103,7 +104,7 @@ Verdict: the predictive 20Q core preserves relative flavor structure and transit
 
 `ROAS-v2` used equal-weight `{1, r^2, r^4, r}`. It produced an accurate triplet (-0.01505 eV vs NIST) and dark residual +0.14767 eV, while the bright state moved to 28.34205 eV with oscillator-strength sum 1.39829. Bright spectral gate: FAIL.
 
-Verdict: top natural directions from mixed ground-state operator-response densities do not yet recover the correct bright-block orientation. The negative ablations are retained as diagnostics; their weights were not fitted to the benchmark spectrum.
+Verdict: top natural directions from these mixed ground-state operator-response densities do not recover the correct bright-block orientation at the tested construction. The negative ablations are retained as diagnostics; their weights were not fitted to the benchmark spectrum.
 
 ## External-space EN2 diagnostic
 
@@ -120,44 +121,85 @@ A quasi-degenerate 3x3 second-order block was used for the bright manifold. Symm
 
 Raw quasi-degenerate EN2 bright-block spread: 0.002102 eV.
 
-Verdict: `PARTIAL`. Diagonal-Q dressing recovers a large fraction of the common color offset and improves relative source agreement, while the diagonal-Q approximation introduces a 2.10 meV rotational-symmetry splitting and therefore does not pass the bright-manifold symmetry gate.
+Verdict: `PARTIAL`. Diagonal-Q dressing recovers a large fraction of the common color offset and improves relative source agreement. Its 2.10 meV raw bright-block spread fails the exact bright-manifold symmetry gate. The result remains a preserved perturbative diagnostic.
 
-## State-balanced selected-Q CI
+## Determinant-selected Q diagnostic
 
-The same fixed 20Q `s4+p6` P-space was retained. External determinants were ranked only from equal-weight Hamiltonian-coupling importance for four P-space classes: ground, triplet, dark singlet and the complete three-component bright manifold. NIST values did not enter selection. Selected P+Q subspaces retained full Q-Q Hamiltonian couplings and were diagonalized exactly inside each selected space.
+A state-balanced determinant selector ranked external determinants by Hamiltonian coupling to active classes and retained full Q-Q couplings inside the selected determinant subspace. It strongly recovered color: independent hosted runs near the nominal 512-determinant point reached NIST RMS around 0.049-0.050 eV and source RMS around 0.018-0.025 eV.
 
-Hosted selected-Q sweep:
+The rerun audit exposed one representation-sensitive degree of freedom. Degenerate external orbitals can rotate without changing the physical source subspace; determinant identities and numerical importance ties then change. Two hosted executions selected 512 and 513 determinants respectively and produced slightly different energies and bright spreads (approximately 5.03 and 3.32 meV), while retaining the same qualitative source-scale convergence.
 
-| selected Q determinants | NIST RMS (eV) | source RMS (eV) | source centered RMS (eV) | bright spread (eV) | bright f sum |
-|---:|---:|---:|---:|---:|---:|
-| 32  | 0.41392 | 0.43182 | 0.00871 | 1.36e-9 | 0.32616 |
-| 64  | 0.34826 | 0.36507 | 0.01291 | 1.36e-9 | 0.32426 |
-| 128 | 0.23304 | 0.24695 | 0.01855 | 0.00206 | 0.32335 |
-| 256 | 0.12168 | 0.12734 | 0.01755 | 0.00495 | 0.32307 |
-| 512 | 0.04993 | 0.02483 | 0.00830 | 0.00503 | 0.31931 |
+Verdict: `COLOR_RECOVERY_PASS__GAUGE_OPEN`. This path remains a historical convergence diagnostic. The canonical external-bath selector is the rotation-covariant natural-orbital construction below.
 
-At 512 selected external determinants:
+## Rotation-covariant complete-class natural-orbital bath
 
-- triplet: 19.78022 eV; NIST residual -0.03939 eV; source residual -0.02259 eV
-- dark singlet: 20.57933 eV; NIST residual -0.03644 eV; source residual -0.03394 eV
-- bright singlet: 21.28583 eV; NIST residual +0.06781 eV; source residual -0.01366 eV
-- source RMS reduction relative to the bare 20Q core: 0.66235 -> 0.02483 eV (about 26.7x)
-- NIST RMS reduction relative to the bare 20Q core: 0.64302 -> 0.04993 eV (about 12.9x)
-- full d-aug source NIST RMS: approximately 0.04805 eV
-- P-space weights remain above 0.995 for ground/dark/bright and above 0.998 for the matched triplet eigenstate weight; active-target overlap tracking remains high
+The canonical bath is built from physical coupling-response states
 
-Verdict: `SELECTED_Q_COLOR_RECOVERY_PASS` for convergence to the tested d-aug source-quality scale. The 20Q core plus a coupling-selected classical bath reproduces the three source excitation energies to 0.02483 eV RMS and reaches approximately the NIST RMS of the full source representation. Exact angular closure of the selected bath remains OPEN because the 512-determinant truncation produces a 5.03 meV bright-manifold spread.
+`|chi_c> = Q H |Psi_c^P>`
+
+for complete active classes:
+
+- ground singlet: 1 state
+- lowest triplet: complete three-state spin manifold
+- lowest dark excited singlet: 1 state
+- first bright singlet: complete three-state p manifold
+
+For every class, normalized Q-coupling states produce a spin-summed external one-body density. Class densities are trace-normalized and equally weighted. Diagonalization yields external natural orbitals; numerically degenerate occupation eigenspaces are admitted as complete blocks.
+
+Hard rotation gauge: all 52 external spatial orbitals were deliberately mixed by a random orthogonal transformation and the bath was rebuilt from transformed integrals.
+
+Gauge result at the 10-external-orbital bath:
+
+- minimum principal cosine: 0.9999999999999991
+- maximum principal-cosine error: 7.99e-15
+- projector Frobenius distance: 0.0
+- selected external spatial dimension: 10 before and after rotation
+- retained normalized response occupation: 0.82476801865 in both representations
+
+Verdict: `Q_BASIS_ROTATION_GAUGE_PASS`.
+
+The external response occupation groups begin as
+
+`1, 3, 1, 5, 3, 5, 3, 7, ...`
+
+and are retained as whole eigenspaces. Hosted convergence:
+
+| external natural orbitals | total spatial orbitals | NIST RMS (eV) | source RMS (eV) | bright spread (eV) | triplet spread (eV) | bright f sum |
+|---:|---:|---:|---:|---:|---:|---:|
+| 4  | 14 | 0.22948 | 0.24474 | 2.64e-11 | 4.97e-14 | 0.32008 |
+| 10 | 20 | 0.20109 | 0.21509 | 7.60e-11 | 2.17e-13 | 0.32056 |
+| 13 | 23 | 0.05566 | 0.02862 | 7.62e-11 | 1.81e-13 | 0.31576 |
+
+The requested 7- and 10-orbital prefixes both close at the same 10-dimensional complete eigenspace because the fourth occupation group has dimension five.
+
+At 13 external natural orbitals:
+
+- triplet: 19.76843 eV; NIST residual -0.05118 eV; source residual -0.03439 eV
+- dark singlet: 20.57865 eV; NIST residual -0.03712 eV; source residual -0.03462 eV
+- bright singlet: 21.29079 eV; NIST residual +0.07277 eV; source residual -0.00870 eV
+- source RMS: 0.02862 eV
+- source centered RMS: 0.01217 eV
+- NIST RMS: 0.05566 eV versus approximately 0.04805 eV for the full 62-orbital d-aug source
+- bright manifold spread: 7.62e-11 eV
+- triplet manifold spread: 1.81e-13 eV
+- bright oscillator-strength sum: 0.31576
+- active P-space weights: ground 0.99571, triplet mean 0.99875, dark 0.99782, bright mean 0.99914
+
+Verdict: `NATURAL_BATH_COLOR_AND_SYMMETRY_PASS`. The fixed 20Q flavor core plus a 13-spatial-orbital rotation-covariant classical bath reaches the tested full-source accuracy scale while preserving complete triplet and bright manifolds to numerical precision.
 
 ## Current gates
 
 - exact 20Q implementation — PASS
 - 20Q information-capacity upper bound for tested He sectors — PASS
-- predictive symmetry-block flavor preservation — PASS at the tested active-space diagnostics
-- selected-Q recovery of source-scale color accuracy — PASS
-- exact angular closure of selected-Q bath — OPEN
+- predictive symmetry-block flavor preservation — PASS
+- external bath Q-basis rotation gauge — PASS
+- complete triplet/bright manifold closure in the canonical bath — PASS
+- natural-bath recovery of source-scale color accuracy — PASS
 - broader He I line/intensity benchmark — OPEN
 - physical quantum backend execution — OPEN
 
 ## Promotion rule
 
-Q1 remains `PARTIAL_PASS` while angular bath closure, broader helium spectroscopy and physical-backend execution remain open. Hosted simulated-reference PASS gates support the implemented 20Q/core-plus-bath architecture at the tested helium benchmark only.
+Q1 remains `PARTIAL_PASS` while broader helium spectroscopy and physical-backend execution remain open. The tested simulated-reference architecture promoted by this receipt is
+
+`fixed 20Q symmetry/flavor core + complete-class rotation-covariant external natural-orbital bath`.
