@@ -2,7 +2,7 @@
 
 ## Status
 
-Candidate formalism under executable validation. No empirical spectral wavelength is used as an input to the gross hydrogen solver.
+Candidate formalism under executable validation. The gross hydrogen solver takes physical constants and quantum numbers as inputs; empirical spectral data are reserved for benchmark fixtures.
 
 ## 1. Color coordinate
 
@@ -41,7 +41,7 @@ The minimal H0 flavor state records:
 - radial node counts `N_r=n-l-1`,
 - E1 selection gate,
 - central/contact exposure,
-- later: radial signed-overlap coherence and full multipole decomposition.
+- signed radial overlap and cancellation coherence.
 
 For a gross color terminating on shell `n_f`, the number of distinct orbital E1 routes is
 
@@ -79,9 +79,39 @@ and the contact exposure
 \pi a_H^3|\psi_{nl}(0)|^2=\frac{\delta_{l0}}{n^3}.
 \]
 
-These coordinates are kept separate rather than collapsed into a single scalar.
+These coordinates remain separately available in the fingerprint.
 
-## 5. Flavor-to-color conversion under a magnetic field
+## 5. Radial eclipse coherence
+
+With `u=r/a_H` and normalized dimensionless radial functions `R_tilde_nl(u)`, define
+
+\[
+g_{if}(u)=\widetilde R_i(u)\widetilde R_f(u)u^3.
+\]
+
+The signed and unsigned E1 radial overlaps are
+
+\[
+R_{if}=\int_0^\infty g_{if}(u)du,
+\qquad
+A_{if}=\int_0^\infty |g_{if}(u)|du,
+\]
+
+and the radial cancellation coherence is
+
+\[
+\mathcal C_{if}=\frac{|R_{if}|}{A_{if}}.
+\]
+
+`C=1` marks complete radial sign coherence; decreasing values quantify stronger cancellation among radial regions.
+
+## 6. Relativistic flavor splitting
+
+The reference relativistic layer evaluates the hydrogenic Dirac energy by `(n,j)` using the ordinary-hydrogen reduced mass as the compact recoil approximation. The `2p_1/2` / `2p_3/2` split is benchmarked against a locked NIST ASD target.
+
+The pure Coulomb-Dirac `(n,j)` degeneracy keeps `2s_1/2` and `2p_1/2` on the same reference energy. Their observed separation is reserved for the Lamb/QED gate.
+
+## 7. Flavor-to-color conversion under a magnetic field
 
 In the weak-field linear Zeeman regime,
 
@@ -89,20 +119,26 @@ In the weak-field linear Zeeman regime,
 \Delta\nu_Z=\frac{\mu_B}{h}B\left(g_um_u-g_lm_l\right).
 \]
 
-Thus an `m_j` flavor coordinate that is degenerate at `B=0` is mapped into a measurable frequency displacement when the degeneracy is lifted.
+For `p` states the continuous crossover uses
 
-## 6. Validation boundary
+\[
+\frac{H}{h}=A\frac{\mathbf L\cdot\mathbf S}{\hbar^2}
++\frac{\mu_B}{h}B(L_z+2S_z)/\hbar.
+\]
+
+At weak field the eigenbranches recover the `|j,m_j>` Landé slopes. At strong field they approach the uncoupled `|m_l,m_s>` Paschen–Back slopes.
+
+## 8. Validation boundary
 
 H0 currently separates:
 
-- analytic gross-color reconstruction — implemented,
-- orbital E1 flavor gates — implemented,
-- central exposure kernels — implemented,
-- linear Zeeman flavor-to-color mapping — implemented,
-- full relativistic fine-structure solver — OPEN,
+- analytic gross-color reconstruction — PASS on hosted CI,
+- orbital E1 flavor gates — PASS on hosted CI,
+- central exposure kernels — PASS on hosted CI,
+- reduced-mass Dirac fine-structure reference — PASS against the declared NIST tolerance,
+- linear Zeeman and p-state Paschen–Back continuation — implemented and tested,
+- signed radial cancellation/coherence — implemented and tested,
 - full Lamb/QED solver — OPEN,
-- signed radial cancellation/coherence solver — OPEN,
-- empirical NIST held-out benchmark ledger — OPEN,
-- Paschen–Back continuation — OPEN.
+- broad empirical NIST held-out benchmark ledger — OPEN.
 
-No OPEN item is promoted by the presence of the analytic hydrogen checks.
+OPEN items retain their independent validation status until their own gates are resolved.
