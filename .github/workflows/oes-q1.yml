@@ -16,6 +16,6 @@ jobs:
       - name: Install Q1 dependencies
         run: python -m pip install -e '.[q1]'
       - name: Run Q1 core gates
-        run: python -m unittest tests.test_quantum_q1_core -v
+        run: python -m unittest discover -s tests -p 'test_quantum_q1_core.py' -v
       - name: Run Q1 helium 20Q gate
-        run: python -m unittest tests.test_quantum_q1_helium -v
+        run: python -m unittest discover -s tests -p 'test_quantum_q1_helium.py' -v
