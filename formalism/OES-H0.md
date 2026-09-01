@@ -109,9 +109,43 @@ and the radial cancellation coherence is
 
 The reference relativistic layer evaluates the hydrogenic Dirac energy by `(n,j)` using the ordinary-hydrogen reduced mass as the compact recoil approximation. The `2p_1/2` / `2p_3/2` split is benchmarked against a locked NIST ASD target.
 
-The pure Coulomb-Dirac `(n,j)` degeneracy keeps `2s_1/2` and `2p_1/2` on the same reference energy. Their observed separation is reserved for the Lamb/QED gate.
+The pure Coulomb-Dirac `(n,j)` degeneracy keeps `2s_1/2` and `2p_1/2` on the same reference energy. Their measured separation defines the Lamb/QED benchmark gate.
 
-## 7. Flavor-to-color conversion under a magnetic field
+## 7. Leading QED Lamb layer
+
+For the `n=2` Lamb interval, OES-H0 currently evaluates a controlled leading low-Z approximation with
+
+\[
+\Delta E_{SE}=\frac{\alpha}{\pi}\frac{\alpha^4}{n^3}
+\left(\frac{m_r}{m_e}\right)^3m_ec^2
+\left[A_{41}L+A_{40}\right],
+\]
+
+where
+
+\[
+L=\ln\left[\frac{m_e}{m_r}\alpha^{-2}\right],
+\]
+
+and the state dependence includes the Bethe logarithms
+
+\[
+\ln k_0(2S)=2.811769893,
+\qquad
+\ln k_0(2P)=-0.030016709.
+\]
+
+The leading Uehling vacuum-polarization term uses
+
+\[
+V_{40}=-\frac{4}{15}\delta_{l0}.
+\]
+
+For ordinary hydrogen this layer gives a `2S_1/2-2P_1/2` interval of about `1050.55 MHz`, compared with the locked NIST target near `1057.85 MHz`. The residual is retained for higher-order self-energy, recoil, two-loop, finite-size and related QED contributions.
+
+This gate shows that central/contact exposure is one ingredient of the Lamb structure while the Bethe logarithm contributes a state-wide spectral component.
+
+## 8. Flavor-to-color conversion under a magnetic field
 
 In the weak-field linear Zeeman regime,
 
@@ -128,7 +162,7 @@ For `p` states the continuous crossover uses
 
 At weak field the eigenbranches recover the `|j,m_j>` Landé slopes. At strong field they approach the uncoupled `|m_l,m_s>` Paschen–Back slopes.
 
-## 8. Validation boundary
+## 9. Validation boundary
 
 H0 currently separates:
 
@@ -136,9 +170,10 @@ H0 currently separates:
 - orbital E1 flavor gates — PASS on hosted CI,
 - central exposure kernels — PASS on hosted CI,
 - reduced-mass Dirac fine-structure reference — PASS against the declared NIST tolerance,
-- linear Zeeman and p-state Paschen–Back continuation — implemented and tested,
-- signed radial cancellation/coherence — implemented and tested,
-- full Lamb/QED solver — OPEN,
+- linear Zeeman and p-state Paschen–Back continuation — PASS on hosted CI,
+- signed radial cancellation/coherence — PASS on hosted CI,
+- leading one-loop Lamb/QED reference — implemented; exact-head CI pending,
+- complete QED closure — OPEN,
 - broad empirical NIST held-out benchmark ledger — OPEN.
 
 OPEN items retain their independent validation status until their own gates are resolved.
