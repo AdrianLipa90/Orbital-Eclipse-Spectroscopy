@@ -1,0 +1,19 @@
+{
+  "source": {
+    "name": "NIST Atomic Spectra Database",
+    "version": "5.12",
+    "accessed": "2026-09-01",
+    "url": "https://physics.nist.gov/cgi-bin/ASD/energy1.pl?conf_out=on&format=0&j_out=on&level_out=on&multiplet_ordered=0&output=0&page_size=15&spectrum=H+I&term_out=on&unc_out=1&units=1"
+  },
+  "levels_eV_above_1s": {
+    "1s_2S_1/2": 0.0,
+    "2p_2P_1/2": 10.19880615024,
+    "2p_2P_3/2": 10.19885151459,
+    "2s_2S_1/2": 10.19881052514816
+  },
+  "derived_targets": {
+    "2p_fine_split_GHz": 10.9690510301,
+    "2s_2p1/2_lamb_split_MHz": 1057.8481
+  },
+  "use": "benchmark_only_not_solver_input"
+}
