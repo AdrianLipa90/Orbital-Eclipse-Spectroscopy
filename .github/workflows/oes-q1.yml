@@ -25,3 +25,5 @@ jobs:
         run: python scripts/sweep_q1_active_space.py
       - name: Predict held-out first bright He I singlet line
         run: python scripts/run_q1_spectroscopy.py
+      - name: Evaluate TAAS-v1 transition-aware compression at fixed 20Q
+        run: python scripts/run_q1_taas.py
