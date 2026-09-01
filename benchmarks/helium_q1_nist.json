@@ -1,0 +1,13 @@
+{
+  "source": {
+    "name": "NIST Atomic Spectra Database He I",
+    "version": "5.12",
+    "accessed": "2026-09-01",
+    "levels_url": "https://physics.nist.gov/cgi-bin/ASD/energy1.pl?biblio=on&conf_out=on&format=0&j_out=on&lande_out=on&level_out=on&output=0&page_size=15&perc_out=on&spectrum=He+I&submit=Retrieve+Data&term_out=on&unc_out=1&units=0"
+  },
+  "targets_eV": {
+    "1s2s_3S1": 19.81961436,
+    "1s2s_1S0": 20.61577465
+  },
+  "use": "held_out_experimental_benchmark_only"
+}
