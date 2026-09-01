@@ -1,16 +1,27 @@
 """External-space energy dressing for fixed-particle OES active spaces.
 
-The active P-space wavefunction stays inside the fixed qubit register.  A larger
+The active P-space wavefunction stays inside the fixed qubit register. A larger
 one-particle source basis is partitioned into P (the first active orbitals) and
-Q (all determinants containing at least one external spin orbital).  We build
+Q (all determinants containing at least one external spin orbital). We build
 only the Q<-P Hamiltonian coupling and Q diagonal, never the full dense FCI
 matrix.
 
-The initial diagnostic is unshifted Epstein-Nesbet second order
+For an isolated state the initial diagnostic is unshifted Epstein-Nesbet second
+order
 
     dE_I^(2) = sum_a |<a|H|Psi_I>|^2 / (E_I - H_aa),  a in Q.
 
-No fitted shift or experimental energy enters.  Small denominators are reported
+For an exactly or quasi-degenerate P-space manifold, state-by-state EN2 is not
+basis invariant. The corresponding diagnostic therefore uses the full
+second-order effective block
+
+    W_ij^(2)(E_ref) = sum_a <Psi_i|H|a><a|H|Psi_j> / (E_ref - H_aa)
+
+and diagonalizes W inside the degenerate manifold. This distinguishes genuine
+symmetry breaking by the diagonal-Q approximation from arbitrary rotations of
+the active eigenvectors.
+
+No fitted shift or experimental energy enters. Small denominators are reported
 and fail closed rather than silently regularized.
 """
 
@@ -42,7 +53,7 @@ class ExternalCouplingSpace:
 def complete_mo_basis_preserving_active(mf, C_active: np.ndarray, tol: float = 1e-10) -> np.ndarray:
     """Return a complete AO coefficient matrix whose first columns are C_active.
 
-    The canonical RHF MO basis is S-orthonormal.  Active vectors are converted
+    The canonical RHF MO basis is S-orthonormal. Active vectors are converted
     to that coordinate system and kept exactly; projected canonical unit vectors
     deterministically fill the orthogonal complement.
     """
@@ -192,17 +203,11 @@ def build_external_coupling_space(
     )
 
 
-def en2_correction(
+def _checked_denominators(
     energy_hartree: float,
-    state: np.ndarray,
     external: ExternalCouplingSpace,
-    denominator_floor: float = 1e-5,
-) -> Dict[str, float]:
-    """Return unshifted Epstein-Nesbet second-order correction and diagnostics."""
-    state = np.asarray(state, dtype=complex)
-    if state.ndim != 1 or state.shape[0] != external.coupling_qp.shape[1]:
-        raise ValueError("state dimension incompatible with active P space")
-    v = external.coupling_qp @ state
+    denominator_floor: float,
+) -> tuple[np.ndarray, float]:
     denominators = float(energy_hartree) - external.diagonal_hartree
     abs_den = np.abs(denominators)
     min_abs = float(np.min(abs_den))
@@ -211,6 +216,21 @@ def en2_correction(
         raise RuntimeError(
             f"EN2 intruder gate failed: {near} denominators below {denominator_floor} Ha; min={min_abs} Ha"
         )
+    return denominators, min_abs
+
+
+def en2_correction(
+    energy_hartree: float,
+    state: np.ndarray,
+    external: ExternalCouplingSpace,
+    denominator_floor: float = 1e-5,
+) -> Dict[str, float]:
+    """Return unshifted state-specific Epstein-Nesbet second-order correction."""
+    state = np.asarray(state, dtype=complex)
+    if state.ndim != 1 or state.shape[0] != external.coupling_qp.shape[1]:
+        raise ValueError("state dimension incompatible with active P space")
+    v = external.coupling_qp @ state
+    denominators, min_abs = _checked_denominators(energy_hartree, external, denominator_floor)
     weights = np.abs(v) ** 2
     correction = float(np.sum(weights / denominators).real)
     return {
@@ -218,5 +238,51 @@ def en2_correction(
         "coupling_norm2_hartree2": float(np.sum(weights).real),
         "min_abs_denominator_hartree": min_abs,
         "max_abs_term_hartree": float(np.max(np.abs(weights / denominators))),
+        "external_determinants": int(len(external.external_basis)),
+    }
+
+
+def en2_degenerate_block(
+    reference_energy_hartree: float,
+    states: np.ndarray,
+    external: ExternalCouplingSpace,
+    denominator_floor: float = 1e-5,
+) -> Dict[str, object]:
+    """Return basis-invariant second-order effective Hamiltonian for a P manifold.
+
+    ``states`` has shape (dim(P), n_states) and its columns must be orthonormal.
+    A single shared reference energy is required because this primitive is for an
+    exactly/quasi-degenerate manifold. The eigenvalues of the returned W block
+    are the second-order corrections in the optimally rotated manifold basis.
+    """
+    states = np.asarray(states, dtype=complex)
+    if states.ndim != 2 or states.shape[0] != external.coupling_qp.shape[1]:
+        raise ValueError("state block dimension incompatible with active P space")
+    n_states = states.shape[1]
+    if n_states < 2:
+        raise ValueError("degenerate block requires at least two states")
+    gram = states.conj().T @ states
+    if not np.allclose(gram, np.eye(n_states), atol=1e-10):
+        raise ValueError("degenerate block states must be orthonormal")
+
+    v = external.coupling_qp @ states
+    denominators, min_abs = _checked_denominators(
+        reference_energy_hartree,
+        external,
+        denominator_floor,
+    )
+    W = v.conj().T @ (v / denominators[:, None])
+    W = 0.5 * (W + W.conj().T)
+    correction_eigenvalues = np.linalg.eigvalsh(W).real
+    mean_correction = float(np.trace(W).real / n_states)
+    spread = float(np.max(correction_eigenvalues) - np.min(correction_eigenvalues))
+
+    return {
+        "correction_matrix_hartree": [[float(x.real) for x in row] for row in W],
+        "correction_eigenvalues_hartree": [float(x) for x in correction_eigenvalues],
+        "mean_correction_hartree": mean_correction,
+        "correction_spread_hartree": spread,
+        "coupling_frobenius_norm2_hartree2": float(np.sum(np.abs(v) ** 2).real),
+        "min_abs_denominator_hartree": min_abs,
         "external_determinants": int(len(external.external_basis)),
     }
