@@ -62,3 +62,16 @@ jobs:
         run: python -m pip install -e '.[q1]'
       - name: Evaluate ROAS-v1 operator-class selection at fixed 20Q
         run: python scripts/run_q1_daug_roas_20q.py
+
+  helium-daug-roas-v2-20q:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Q1 dependencies
+        run: python -m pip install -e '.[q1]'
+      - name: Evaluate ROAS-v2 minimal operator-family selection at fixed 20Q
+        run: python scripts/run_q1_daug_roas_v2_20q.py
