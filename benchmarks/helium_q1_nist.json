@@ -7,7 +7,12 @@
   },
   "targets_eV": {
     "1s2s_3S1": 19.81961436,
-    "1s2s_1S0": 20.61577465
+    "1s2s_1S0": 20.61577465,
+    "1s2p_1P1": 21.21802253
   },
-  "use": "held_out_experimental_benchmark_only"
+  "selection_protocol": {
+    "active_space_selection_targets": ["1s2s_3S1", "1s2s_1S0"],
+    "held_out_after_selection": ["1s2p_1P1"]
+  },
+  "use": "experimental_benchmark_only_not_solver_input"
 }
