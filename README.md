@@ -15,14 +15,15 @@ The executable reference layer currently includes:
 - weak-field Zeeman flavor-to-color conversion,
 - continuous p-state Zeeman → Paschen–Back crossover,
 - normalized hydrogen radial functions,
-- signed/unsigned E1 radial overlaps and cancellation coherence.
+- signed/unsigned E1 radial overlaps and cancellation coherence,
+- leading low-Z `2S-2P1/2` QED reference from A41/A40 self-energy plus leading Uehling vacuum polarization.
 
-The gross solver takes physical constants and quantum numbers as inputs. Empirical spectral data live in benchmark fixtures and remain outside solver input paths.
+The gross and reference QED solvers take physical constants, quantum numbers and declared theoretical coefficients as inputs. Empirical spectral data live in benchmark fixtures and remain outside solver input paths.
 
 The executable code is in `oes/`, formal definitions are in `formalism/`, held-out targets are in `benchmarks/`, and validation state is recorded in `receipts/`.
 
 ## Current status
 
-Hosted CI has already validated the gross, flavor, Dirac and magnetic reference layers on earlier exact branch heads. The current radial-extension head is undergoing its own exact-head validation.
+Hosted CI has validated the gross, flavor, Dirac, magnetic and radial reference layers on exact branch heads. The current leading-QED extension is undergoing its own exact-head validation.
 
-Full Lamb/QED closure and a broader held-out hydrogen level/line benchmark remain explicit OPEN gates.
+Complete QED closure and a broader held-out hydrogen level/line benchmark remain explicit OPEN gates.
