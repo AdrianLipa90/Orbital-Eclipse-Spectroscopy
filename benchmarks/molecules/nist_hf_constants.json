@@ -1,0 +1,15 @@
+{
+  "species": "hydrogen fluoride",
+  "isotopologue": "H19F",
+  "state": "X 1Sigma+",
+  "source": "NIST Chemistry WebBook SRD 69, Constants of diatomic molecules, Huber and Herzberg compilation",
+  "source_url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7664393&Mask=FFFFFF",
+  "retrieved_context_date": "2026-09-02",
+  "usage": "Benchmark outputs only. No listed experimental constant enters geometry search, active-space selection, Hamiltonian construction, or fit parameters.",
+  "re_angstrom": 0.916808,
+  "omega_e_cm-1": 4138.32,
+  "omega_exe_cm-1": 89.88,
+  "B_e_cm-1": 20.9557,
+  "alpha_e_cm-1": 0.798,
+  "D_e_cm-1": 0.002151
+}
