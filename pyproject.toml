@@ -9,6 +9,7 @@ description = "Orbital Eclipse Spectroscopy reference implementation"
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=1.26",
+    "scipy>=1.6.0",
 ]
 
 [project.optional-dependencies]
