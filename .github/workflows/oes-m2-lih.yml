@@ -5,6 +5,7 @@ on:
     branches: [oes-m2-lih-20q, main]
   pull_request:
 
+# Keep the branch head executable even after receipt-only commits.
 jobs:
   lih-20q:
     runs-on: ubuntu-latest
