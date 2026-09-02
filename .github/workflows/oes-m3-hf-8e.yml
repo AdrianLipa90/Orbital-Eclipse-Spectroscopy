@@ -1,0 +1,22 @@
+name: OES M3 HF 8e 20Q
+
+on:
+  push:
+    branches: [oes-m3-hf-8e-20q]
+  pull_request:
+
+jobs:
+  hf-8e-20q:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install M3.1 dependencies
+        run: python -m pip install -e '.[q1]'
+      - name: Run sparse algebra regression
+        run: python -m unittest tests.test_sparse_ms tests.test_frozen_core tests.test_hf_m3 -v
+      - name: Run HF eight-active-electron fixed-20Q scaling gate
+        run: python scripts/run_m3_hf_8e_stress.py
