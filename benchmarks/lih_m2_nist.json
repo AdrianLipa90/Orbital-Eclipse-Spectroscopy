@@ -1,0 +1,18 @@
+{
+  "source": "NIST Chemistry WebBook SRD 69, constants of diatomic molecules for 7LiH",
+  "retrieved_context_date": "2026-09-02",
+  "ground_state": "X 1Sigma+",
+  "re_angstrom": 1.5957,
+  "omega_e_cm-1": 1405.65,
+  "omega_ex_e_cm-1": 23.20,
+  "omega_e_y_e_cm-1": 0.163,
+  "B_e_cm-1": 7.5131,
+  "alpha_e_cm-1": 0.2132,
+  "gamma_e_cm-1": 0.00075,
+  "D_e_cm-1": 0.0008617,
+  "beta_e_cm-1": -0.0000160,
+  "dipole_v0_debye": 5.8820,
+  "dipole_v1_debye": 5.9905,
+  "dipole_v2_debye": 6.098,
+  "usage": "Benchmark outputs only. No listed experimental constant enters active-space selection, electronic Hamiltonian construction, Born-Oppenheimer sampling, nuclear Hamiltonian construction, or rovibrational eigenvalue solution."
+}
