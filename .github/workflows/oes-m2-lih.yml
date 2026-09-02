@@ -20,3 +20,5 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_*.py' -v
       - name: Run LiH fixed-20Q heteronuclear baseline
         run: python scripts/run_m2_lih_20q.py
+      - name: Run LiH rovibrational spectrum baseline
+        run: python scripts/run_m2_lih_rovib.py
