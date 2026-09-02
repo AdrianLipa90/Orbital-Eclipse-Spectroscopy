@@ -1,0 +1,15 @@
+{
+  "species": "hydrogen chloride",
+  "isotopologue": "H35Cl",
+  "state": "X 1Sigma+",
+  "source": "NIST Chemistry WebBook SRD 69, Constants of diatomic molecules, Huber and Herzberg compilation",
+  "source_url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7647010&Mask=1000",
+  "retrieved_context_date": "2026-09-02",
+  "usage": "Benchmark outputs only. No listed experimental constant enters geometry search, active-space selection, Hamiltonian construction, or fit parameters.",
+  "re_angstrom": 1.27455,
+  "omega_e_cm-1": 2990.946,
+  "omega_exe_cm-1": 52.8186,
+  "B_e_cm-1": 10.59341,
+  "alpha_e_cm-1": 0.307181,
+  "D_e_cm-1": 0.00053194
+}
