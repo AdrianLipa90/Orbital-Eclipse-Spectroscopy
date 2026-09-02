@@ -4,7 +4,7 @@ Date: 2026-09-02
 Branch: `oes-m2-lih-20q`
 Parent: `oes-m1-h2-20q`
 Backend: `SIMULATED_REFERENCE`
-Status: `PARTIAL_PASS__LIH_HETERONUCLEAR_FIXED_20Q_BASELINE`
+Status: `PARTIAL_PASS__LIH_ROVIBRATIONAL_FIXED_20Q_BASELINE`
 
 ## Canonical register
 
@@ -83,12 +83,71 @@ in atomic units gives:
 
 No NIST value is used to fit the active-space Hamiltonian or the local potential curve.
 
+## M2.1 hosted rovibrational spectrum gate
+
+Validated implementation head: `afd87f0b23ffe6e370d84e4cf71df7a07cb53e31`.
+Hosted workflow: `OES M2 LiH 20Q`, run `33576868980`, job `100082656678` — PASS.
+Full exact-head regression: 59/59 PASS.
+The pre-existing M2 fixed-20Q LiH runner also passed unchanged on the same head.
+
+The electronic Born-Oppenheimer curve was sampled at 18 geometries from 2.0 to 5.4 bohr using the same `cc-pVTZ`, four-electron, fixed-20Q active-space protocol. The nuclear solver then used only this sampled OES potential and the independently computed 7LiH reduced nuclear mass. It applied a PCHIP interpolation inside the sampled interval and a finite-difference radial Hamiltonian including the J(J+1)/(2 mu R^2) centrifugal term for J=0,1,2. Experimental constants were not solver inputs.
+
+The requested v=0..3 states remain strongly confined inside the sampled potential interval; the smallest reported endpoint margin exceeds 7078 cm^-1.
+
+### Predicted term values
+
+For J=0:
+
+- v=0: 0.000000 cm^-1
+- v=1: 1335.003803 cm^-1
+- v=2: 2636.911126 cm^-1
+- v=3: 3888.990176 cm^-1
+
+For J=1:
+
+- v=0: 14.419103 cm^-1
+- v=1: 1349.029100 cm^-1
+- v=2: 2650.499637 cm^-1
+- v=3: 3902.215904 cm^-1
+
+For J=2:
+
+- v=0: 43.237747 cm^-1
+- v=1: 1377.061116 cm^-1
+- v=2: 2677.657587 cm^-1
+- v=3: 3928.648907 cm^-1
+
+### Vibrational constants recovered from OES levels
+
+- fundamental v=0→1: 1335.003803 cm^-1
+- independent NIST-constant-derived benchmark: 1359.779750 cm^-1
+- residual: -24.775947 cm^-1 (~-1.82%)
+- omega_e: 1352.065647 cm^-1 vs NIST 1405.65 cm^-1; residual -53.584353 cm^-1 (~-3.81%)
+- omega_e x_e: 3.999395 cm^-1 vs NIST 23.20 cm^-1; residual -19.200605 cm^-1 (~-82.76%)
+- omega_e y_e: -2.788632 cm^-1 vs NIST +0.163 cm^-1; higher-order anharmonicity is not reproduced by the present fixed-20Q potential.
+
+### Rotational and vibration-rotation constants recovered from OES levels
+
+- B_v(v=0,1,2) = 7.211182, 7.014197, 6.795845 cm^-1
+- B_e = 7.301662 cm^-1 vs NIST 7.5131 cm^-1; residual -0.211438 cm^-1 (~-2.81%)
+- alpha_e = 0.175619 cm^-1 vs NIST 0.2132 cm^-1; residual -0.037581 cm^-1 (~-17.63%)
+- gamma_e = -0.010683 cm^-1 vs NIST +0.00075 cm^-1; higher-order vibration-rotation curvature is not reproduced by the present baseline
+- D_v(v=0) = 0.000815104 cm^-1 vs NIST D_e = 0.0008617 cm^-1; residual -0.000046596 cm^-1 (~-5.41%)
+
+The M2.1 result therefore separates two regimes cleanly: the low-order rovibrational observables (fundamental, B_e and D_v0) are already close to the independent experimental benchmark, while the higher-order anharmonic and vibration-rotation curvature terms expose the remaining fixed-active-space / electronic-potential error budget.
+
 ## Verdict
 
 `M2_IMPLEMENTATION_PASS` — the OES four-electron M_S=0 determinant-subspace Hamiltonian reproduces independent PySCF FCI at machine precision in the identical ten-orbital active space.
 
 `M2_HETERONUCLEAR_POLARIZATION_PASS` — unequal Li/H inverse-radius exposures and a finite permanent dipole emerge from the many-electron state on the fixed 20Q register.
 
-`M2_SPECTROSCOPIC_BASELINE_PARTIAL_PASS` — the same fixed active space predicts equilibrium geometry, harmonic vibration and rotational constant with residuals of approximately 1.65%, 2.77% and 3.18% against the stored 7LiH benchmarks; the static dipole diagnostic is within approximately 1.62% of the stored v=0 value.
+`M2_SPECTROSCOPIC_BASELINE_PARTIAL_PASS` — equilibrium geometry, local harmonic vibration and rotational scale are recovered at the few-percent level from the same fixed active space.
 
-Broader LiH rovibrational spectroscopy, excited electronic states, dissociation convergence, external-bath refinement and physical-QPU execution remain OPEN.
+`M2_1_ROVIBRATIONAL_SOLVER_PASS` — the sampled OES Born-Oppenheimer potential supports stable, confined numerical v,J eigenstates and independently recovered term values without experimental fitting.
+
+`M2_1_LOW_ORDER_SPECTROSCOPY_PARTIAL_PASS` — the fundamental, B_e and D_v0 are respectively within approximately 1.82%, 2.81% and 5.41% of the stored independent 7LiH benchmarks.
+
+`M2_1_HIGHER_ORDER_REFINEMENT_OPEN` — omega_e x_e, omega_e y_e, alpha_e and gamma_e expose unresolved higher-order potential-shape and vibration-rotation curvature errors. These remain targets for active-space/external-bath/basis refinement rather than post-hoc fitting.
+
+Excited electronic states, transition-intensity/dipole-curve spectroscopy, dissociation convergence, external-bath refinement and physical-QPU execution remain OPEN.
