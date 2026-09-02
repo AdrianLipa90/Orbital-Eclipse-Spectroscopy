@@ -12,7 +12,7 @@ selection, Hamiltonian construction, density reconstruction and curve fitting.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import Dict, Sequence, Tuple
+from typing import Callable, Dict, Sequence, Tuple
 
 import numpy as np
 
@@ -73,6 +73,7 @@ class HClCurveResult:
     rhf_seed_minimum_bohr: float
     active_grid_bohr: Tuple[float, ...]
     active_energies_hartree: Tuple[float, ...]
+    active_recenter_count: int
     fitted_equilibrium_bohr: float
     fitted_equilibrium_angstrom: float
     fitted_curvature_hartree_per_bohr2: float
@@ -271,6 +272,56 @@ def rotational_constant_cm(bond_bohr: float) -> float:
     return HARTREE_TO_WAVENUMBER_CM / (2.0 * HCL35_REDUCED_NUCLEAR_MASS_ME * bond_bohr**2)
 
 
+def _adaptive_bracketed_quadratic(
+    energy_fn: Callable[[float], float],
+    seed_bohr: float,
+    half_width_bohr: float,
+    max_recenters: int = 4,
+):
+    """Build a local five-point grid whose fitted minimum is internally bracketed.
+
+    The search uses computed energies only. No spectroscopic benchmark enters the
+    recentering rule. The final quadratic minimum must lie between the second and
+    fourth grid points, guaranteeing at least one sampled point on either side.
+    """
+    if half_width_bohr <= 0:
+        raise ValueError("active half-width must be positive")
+    if max_recenters < 0:
+        raise ValueError("max_recenters must be non-negative")
+
+    step = float(half_width_bohr) / 2.0
+    center = float(seed_bohr)
+    cache: Dict[float, float] = {}
+
+    def evaluate(r: float) -> float:
+        key = round(float(r), 12)
+        if key not in cache:
+            cache[key] = float(energy_fn(float(r)))
+        return cache[key]
+
+    for recenter_count in range(max_recenters + 1):
+        grid = center + step * np.arange(-2.0, 3.0)
+        energies = np.asarray([evaluate(float(r)) for r in grid], dtype=float)
+        discrete_min = int(np.argmin(energies))
+
+        if discrete_min in (0, len(grid) - 1):
+            center = float(grid[discrete_min])
+            continue
+
+        a, b, _ = np.polyfit(grid, energies, 2)
+        if a <= 0:
+            raise RuntimeError("HCl active local potential fit has non-positive curvature")
+        r_eq = float(-b / (2.0 * a))
+        curvature = float(2.0 * a)
+
+        if float(grid[1]) <= r_eq <= float(grid[-2]):
+            return grid, energies, r_eq, curvature, recenter_count
+
+        center = r_eq
+
+    raise RuntimeError("HCl active minimum could not be internally bracketed without benchmark input")
+
+
 def run_hcl_curve(
     basis_name: str = "cc-pVTZ",
     rhf_scan_bohr: Sequence[float] = (1.90, 2.10, 2.30, 2.50, 2.70, 2.90, 3.10),
@@ -286,15 +337,11 @@ def run_hcl_curve(
         raise RuntimeError("blind HCl RHF minimum lies at scan boundary")
     seed = float(rhf_grid[seed_index])
 
-    active_grid = seed + np.linspace(-active_half_width_bohr, active_half_width_bohr, 5)
-    active_energies = np.asarray([run_hcl_ground_energy(float(r), basis_name) for r in active_grid])
-    a, b, c = np.polyfit(active_grid, active_energies, 2)
-    if a <= 0:
-        raise RuntimeError("HCl active local potential fit has non-positive curvature")
-    r_eq = float(-b / (2.0 * a))
-    if not (float(active_grid[0]) <= r_eq <= float(active_grid[-1])):
-        raise RuntimeError("HCl fitted active minimum lies outside local active scan")
-    curvature = float(2.0 * a)
+    active_grid, active_energies, r_eq, curvature, recenter_count = _adaptive_bracketed_quadratic(
+        lambda r: run_hcl_ground_energy(r, basis_name),
+        seed_bohr=seed,
+        half_width_bohr=active_half_width_bohr,
+    )
     omega_au = float(np.sqrt(curvature / HCL35_REDUCED_NUCLEAR_MASS_ME))
 
     return HClCurveResult(
@@ -305,6 +352,7 @@ def run_hcl_curve(
         rhf_seed_minimum_bohr=seed,
         active_grid_bohr=tuple(float(x) for x in active_grid),
         active_energies_hartree=tuple(float(x) for x in active_energies),
+        active_recenter_count=int(recenter_count),
         fitted_equilibrium_bohr=r_eq,
         fitted_equilibrium_angstrom=r_eq / ANGSTROM_TO_BOHR,
         fitted_curvature_hartree_per_bohr2=curvature,
