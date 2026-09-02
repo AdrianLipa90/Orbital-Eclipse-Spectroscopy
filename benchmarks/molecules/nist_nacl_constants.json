@@ -1,0 +1,14 @@
+{
+  "species": "sodium chloride",
+  "isotopologue": "23Na35Cl",
+  "state": "X 1Sigma+",
+  "re_angstrom": 2.36079,
+  "omega_e_cm-1": 366.0,
+  "omega_e_alternate_dunham_cm-1": 364.60,
+  "B_e_cm-1": 0.2180630,
+  "dipole_equilibrium_debye": 8.97141,
+  "source": "NIST Chemistry WebBook SRD 69, constants of diatomic molecules / Huber-Herzberg compilation and cited microwave-Dunham note",
+  "source_url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7647145&Mask=1000",
+  "retrieved_context_date": "2026-09-02",
+  "usage": "Benchmark outputs only. No listed experimental constant enters geometry search, active-space selection, Hamiltonian construction, or fit parameters. The primary omega_e gate uses the tabulated 366.0 cm^-1 value; the 364.60 cm^-1 Dunham value is retained only as alternate source context."
+}
