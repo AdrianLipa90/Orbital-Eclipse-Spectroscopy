@@ -1,0 +1,22 @@
+name: OES M2 LiH 20Q
+
+on:
+  push:
+    branches: [oes-m2-lih-20q, main]
+  pull_request:
+
+jobs:
+  lih-20q:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install M2 dependencies
+        run: python -m pip install -e '.[q1]'
+      - name: Run core regression and LiH sector gates
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Run LiH fixed-20Q heteronuclear baseline
+        run: python scripts/run_m2_lih_20q.py
