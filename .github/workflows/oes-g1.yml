@@ -1,0 +1,22 @@
+name: OES G1 frozen-core 20Q
+
+on:
+  push:
+    branches: [oes-g1-frozen-core-20q, main]
+  pull_request:
+
+jobs:
+  frozen-core-20q:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install G1 dependencies
+        run: python -m pip install -e '.[q1]'
+      - name: Run full regression including exact projection gate
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Compare OES frozen-core 20Q Hamiltonian with PySCF CASCI
+        run: python scripts/run_g1_frozen_core_20q.py
