@@ -1,0 +1,22 @@
+name: OES G2 sparse fixed-MS 20Q
+
+on:
+  push:
+    branches: [oes-g2-sparse-ms-20q, main]
+  pull_request:
+
+jobs:
+  sparse-fixed-ms-20q:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install G2 dependencies
+        run: python -m pip install -e '.[q1]'
+      - name: Run sparse versus dense algebra gates
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Run six-electron 20Q sparse CASCI stress gate
+        run: python scripts/run_g2_sparse_20q.py
