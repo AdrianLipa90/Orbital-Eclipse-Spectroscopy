@@ -2,7 +2,7 @@
 
 Orbital Eclipse Spectroscopy (OES) is a calculation-first repository for representing an atomic spectral transition as a **gross frequency/color coordinate plus a resolved orbital-flavor geometry**.
 
-Current milestone: **OES-H0 — Hydrogen Orbital-Eclipse Closure**.
+Current integrated frontier: **OES-M3.1 — fixed-20Q molecular reference scaling**, with the earlier **OES-H0 hydrogen orbital-eclipse closure** retained as the atomic spectroscopy baseline.
 
 The executable reference layer currently includes:
 
@@ -16,7 +16,13 @@ The executable reference layer currently includes:
 - locked NIST H I `np` fine-structure benchmarks for `n=2..5`,
 - weak-field Zeeman flavor-to-color conversion,
 - continuous p-state Zeeman → Paschen–Back crossover,
-- leading low-Z `2S-2P1/2` QED reference from A41/A40 self-energy plus leading Uehling vacuum polarization.
+- leading low-Z `2S-2P1/2` QED reference from A41/A40 self-energy plus leading Uehling vacuum polarization,
+- H2 fixed-20Q molecular reference baseline (OES-M1),
+- LiH fixed-20Q and rovibrational reference baseline (OES-M2/M2.1),
+- exact frozen-core active-Hamiltonian reduction (OES-G1),
+- sparse exact fixed-Ms 20Q solver (OES-G2),
+- blind HF reduced-active fixed-20Q spectroscopy baseline (OES-M3),
+- eight-active-electron fixed-20Q scaling gate (OES-M3.1).
 
 Solver inputs are physical constants, quantum numbers and declared theoretical coefficients. Empirical spectral data live in benchmark fixtures and remain outside solver input paths.
 
@@ -24,6 +30,8 @@ The executable code is in `oes/`, formal definitions are in `formalism/`, held-o
 
 ## Current status
 
-Hosted CI has validated the gross, flavor, radial, Dirac, magnetic, leading-QED and `np` fine-series reference gates on exact branch heads.
+Hosted CI has validated the gross, flavor, radial, Dirac, magnetic, leading-QED and `np` fine-series reference gates on exact branch heads. The integrated M3.1 implementation head `9d732a895f2627adcd40037ccb56de1391db96cc` also completed the hosted OES reference suite and the H2, LiH, frozen-core, sparse fixed-Ms, HF spectroscopy and eight-active-electron fixed-20Q workflow gates successfully.
 
-Complete higher-order QED closure and a broad hydrogen line/intensity benchmark remain explicit OPEN gates.
+The molecular/QPU layers described above remain **SIMULATED_REFERENCE** unless a receipt explicitly states otherwise. Physical-QPU execution is not claimed.
+
+Complete higher-order QED closure, broader hydrogen line/intensity benchmarking, systematic molecular active-space/basis convergence and physical-QPU execution remain explicit OPEN gates.
