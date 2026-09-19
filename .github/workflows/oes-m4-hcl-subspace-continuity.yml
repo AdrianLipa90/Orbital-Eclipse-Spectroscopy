@@ -1,0 +1,20 @@
+name: OES M4 HCl subspace continuity
+
+on:
+  push:
+    branches:
+      - oes-m4-hcl-subspace-continuity
+  workflow_dispatch:
+
+jobs:
+  hcl-subspace-continuity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install diagnostic dependencies
+        run: python -m pip install -e '.[q1]'
+      - name: Run benchmark-blind HCl active-subspace continuity diagnostic
+        run: python scripts/run_m4_hcl_subspace_continuity.py
