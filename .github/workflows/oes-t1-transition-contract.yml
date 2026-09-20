@@ -1,0 +1,38 @@
+name: OES T1 transition contract
+
+on:
+  push:
+    paths:
+      - 'oes/transition_contract.py'
+      - 'oes/phase_microscope.py'
+      - 'oes/line_observables.py'
+      - 'tests/test_transition_contract.py'
+      - 'tests/test_line_observables.py'
+      - 'formalism/OES-T1.md'
+      - '.github/workflows/oes-t1-transition-contract.yml'
+  pull_request:
+    paths:
+      - 'oes/transition_contract.py'
+      - 'oes/phase_microscope.py'
+      - 'oes/line_observables.py'
+      - 'tests/test_transition_contract.py'
+      - 'tests/test_line_observables.py'
+      - 'formalism/OES-T1.md'
+      - '.github/workflows/oes-t1-transition-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  transition-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install focused dependencies
+        run: python -m pip install -e . pytest
+      - name: Run OES T1 focused gate
+        run: python -m pytest -q tests/test_transition_contract.py tests/test_line_observables.py
