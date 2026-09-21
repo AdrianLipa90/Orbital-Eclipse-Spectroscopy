@@ -12,6 +12,11 @@ from typing import Any, Mapping, Sequence
 import numpy as np
 from scipy.constants import h, physical_constants
 
+from .invariant_contract import (
+    representation_contract_block,
+    validate_representation_contract_block,
+)
+
 SCHEMA_ID = "OES_TRANSITION_STATE_V0_1"
 TRANSITION_RDM_CONVENTION = "T_pq=<Psi_f|a_p^dagger a_q|Psi_i>"
 HARTREE_J = physical_constants["Hartree energy"][0]
@@ -162,6 +167,7 @@ class OESTransitionState:
                 "real": self.transition_rdm.real.tolist(),
                 "imag": self.transition_rdm.imag.tolist(),
             },
+            "representation_contract": representation_contract_block(),
             "derived": {
                 "signed_energy_gap_hartree": self.signed_energy_gap_hartree,
                 "frequency_hz": self.frequency_hz,
@@ -186,6 +192,11 @@ class OESTransitionState:
         initial = payload.get("initial_state")
         final = payload.get("final_state")
         provenance = payload.get("provenance")
+        representation_contract = payload.get("representation_contract")
+        if representation_contract is not None:
+            if not isinstance(representation_contract, Mapping):
+                raise ValueError("representation_contract must be an object")
+            validate_representation_contract_block(representation_contract)
         nuclei = payload.get("nuclear_framework")
         if not isinstance(initial, Mapping) or not isinstance(final, Mapping):
             raise ValueError("initial_state and final_state objects are required")
