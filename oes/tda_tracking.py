@@ -118,6 +118,30 @@ class TDABlockContinuity:
     cross_overlap_whitened: np.ndarray
 
 
+def _root_indices(
+    roots: Iterable[int],
+    *,
+    nstates: int,
+    name: str,
+) -> tuple[int, ...]:
+    values = tuple(roots)
+    if not values:
+        raise TDATrackingError(f"{name} must not be empty")
+    out = []
+    for value in values:
+        if isinstance(value, (bool, np.bool_)):
+            raise TDATrackingError(f"{name} must contain integer root labels")
+        integer = int(value)
+        if integer != value or integer < 1 or integer > nstates:
+            raise TDATrackingError(
+                f"{name} root labels must lie in 1..{nstates}"
+            )
+        out.append(integer - 1)
+    if len(set(out)) != len(out):
+        raise TDATrackingError(f"{name} root labels must be unique")
+    return tuple(out)
+
+
 def transition_density_block_continuity(
     left_transition_densities: Iterable[np.ndarray],
     right_transition_densities: Iterable[np.ndarray],
@@ -211,10 +235,72 @@ def transition_density_block_continuity(
     )
 
 
+
+def runtime_block_continuity(
+    left_runtime,
+    right_runtime,
+    *,
+    left_roots: Iterable[int],
+    right_roots: Iterable[int],
+    rank_tol: float = 1.0e-12,
+    cosine_atol: float = 1.0e-8,
+) -> TDABlockContinuity:
+    """Compare selected TDA transition-density blocks across two geometries.
+
+    Root labels are 1-based and are selectors only. Physical identity is the
+    resulting transition-density span, not the root numbering.
+    """
+    from .molecular_tda import (
+        MolecularTDARuntime,
+        cross_geometry_ao_overlap,
+    )
+
+    if not isinstance(left_runtime, MolecularTDARuntime):
+        raise TDATrackingError("left_runtime must be MolecularTDARuntime")
+    if not isinstance(right_runtime, MolecularTDARuntime):
+        raise TDATrackingError("right_runtime must be MolecularTDARuntime")
+
+    left_index = _root_indices(
+        left_roots,
+        nstates=len(left_runtime.transition_densities_ao),
+        name="left_roots",
+    )
+    right_index = _root_indices(
+        right_roots,
+        nstates=len(right_runtime.transition_densities_ao),
+        name="right_roots",
+    )
+    if len(left_index) != len(right_index):
+        raise TDATrackingError(
+            "left/right root blocks must have equal dimension"
+        )
+
+    cross_metric = cross_geometry_ao_overlap(
+        left_runtime,
+        right_runtime,
+    )
+    return transition_density_block_continuity(
+        tuple(
+            left_runtime.transition_densities_ao[index]
+            for index in left_index
+        ),
+        tuple(
+            right_runtime.transition_densities_ao[index]
+            for index in right_index
+        ),
+        left_runtime.ao_overlap,
+        right_runtime.ao_overlap,
+        cross_metric,
+        rank_tol=rank_tol,
+        cosine_atol=cosine_atol,
+    )
+
+
 __all__ = [
     "TDATrackingError",
     "TDABlockContinuity",
     "transition_density_inner_product",
     "transition_density_gram",
     "transition_density_block_continuity",
+    "runtime_block_continuity",
 ]
