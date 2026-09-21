@@ -6,12 +6,14 @@ on:
       - 'oes/molecular_tda.py'
       - 'tests/test_molecular_tda.py'
       - 'formalism/OES-T3-molecular-tda-orientation.md'
+      - 'scripts/run_t3_necl2_orientation.py'
       - '.github/workflows/oes-t3-molecular-tda.yml'
   pull_request:
     paths:
       - 'oes/molecular_tda.py'
       - 'tests/test_molecular_tda.py'
       - 'formalism/OES-T3-molecular-tda-orientation.md'
+      - 'scripts/run_t3_necl2_orientation.py'
       - '.github/workflows/oes-t3-molecular-tda.yml'
   workflow_dispatch:
 
@@ -31,3 +33,5 @@ jobs:
         run: python -m pip install -e '.[q1]'
       - name: Run molecular TDA orientation gate
         run: python -m unittest -v tests.test_molecular_tda
+      - name: Emit rigid NeCl2 orientation receipt
+        run: python scripts/run_t3_necl2_orientation.py
