@@ -1,0 +1,43 @@
+name: OES T4 transition-density tracking
+
+on:
+  push:
+    paths:
+      - 'oes/molecular_tda.py'
+      - 'oes/tda_tracking.py'
+      - 'tests/test_tda_tracking.py'
+      - 'tests/test_tda_tracking_pyscf.py'
+      - 'scripts/run_t4_necl2_tracking.py'
+      - 'formalism/OES-T4-transition-density-tracking.md'
+      - '.github/workflows/oes-t4-transition-density-tracking.yml'
+  pull_request:
+    paths:
+      - 'oes/molecular_tda.py'
+      - 'oes/tda_tracking.py'
+      - 'tests/test_tda_tracking.py'
+      - 'tests/test_tda_tracking_pyscf.py'
+      - 'scripts/run_t4_necl2_tracking.py'
+      - 'formalism/OES-T4-transition-density-tracking.md'
+      - '.github/workflows/oes-t4-transition-density-tracking.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tda-tracking:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install OES q1 backend
+        run: python -m pip install -e '.[q1]'
+      - name: Run T4 mathematical tracking controls
+        run: python -m unittest -v tests.test_tda_tracking
+      - name: Run T4 PySCF runtime tracking controls
+        run: python -m unittest -v tests.test_tda_tracking_pyscf
+      - name: Emit rigid NeCl2 transition-density tracking receipt
+        run: python scripts/run_t4_necl2_tracking.py
