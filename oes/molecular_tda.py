@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 import math
-from typing import Iterable, Sequence
+from typing import Any, Iterable, Sequence
 
 import numpy as np
 
@@ -89,6 +89,21 @@ class MolecularTDAResult:
 
 
 @dataclass(frozen=True)
+class MolecularTDARuntime:
+    """Runtime-only payload for cross-geometry state tracking.
+
+    transition_densities_ao uses the TDA X occupied-virtual amplitude mapped
+    into the AO basis as C_occ X C_vir^†. Its absolute scalar normalization is
+    not used for state identity; OES-T4 Gram-whitens transition-density blocks.
+    """
+
+    result: MolecularTDAResult
+    molecule: Any
+    ao_overlap: np.ndarray
+    transition_densities_ao: tuple[np.ndarray, ...]
+
+
+@dataclass(frozen=True)
 class OrientationTDAPoint:
     angle_rad: float
     result: MolecularTDAResult
@@ -113,7 +128,7 @@ class OrientationTDAScan:
         }
 
 
-def run_closed_shell_tda(
+def run_closed_shell_tda_runtime(
     *,
     species_label: str,
     atoms: Sequence[str],
@@ -260,7 +275,7 @@ def run_closed_shell_tda(
             )
         )
 
-    return MolecularTDAResult(
+    result = MolecularTDAResult(
         backend="PYSCF_RHF_TDA",
         species_label=species_label,
         basis_name=basis_name,
@@ -275,6 +290,94 @@ def run_closed_shell_tda(
         states=tuple(states),
         max_oscillator_strength_delta=max_delta,
     )
+
+    mo_coeff = np.asarray(mf.mo_coeff, dtype=complex)
+    mo_occ = np.asarray(mf.mo_occ, dtype=float)
+    occupied = np.where(mo_occ > 0.0)[0]
+    virtual = np.where(mo_occ <= 0.0)[0]
+    if occupied.size < 1 or virtual.size < 1:
+        raise RuntimeError(
+            "molecular TDA requires occupied and virtual orbital sectors"
+        )
+    c_occ = mo_coeff[:, occupied]
+    c_vir = mo_coeff[:, virtual]
+
+    transition_densities = []
+    if len(xy) != excitation.size:
+        raise RuntimeError("TDA amplitude count does not match excitation count")
+    for root_xy in xy:
+        if not isinstance(root_xy, (tuple, list)) or len(root_xy) < 1:
+            raise RuntimeError("unexpected TDA amplitude payload")
+        x_amplitude = np.asarray(root_xy[0], dtype=complex)
+        expected_x_shape = (occupied.size, virtual.size)
+        if x_amplitude.shape != expected_x_shape:
+            raise RuntimeError(
+                f"unexpected TDA X-amplitude shape {x_amplitude.shape}; "
+                f"expected {expected_x_shape}"
+            )
+        if (
+            not np.all(np.isfinite(x_amplitude.real))
+            or not np.all(np.isfinite(x_amplitude.imag))
+        ):
+            raise RuntimeError("TDA X amplitudes must be finite")
+        transition_densities.append(
+            c_occ @ x_amplitude @ c_vir.conj().T
+        )
+
+    ao_overlap = np.asarray(
+        mol.intor_symmetric("int1e_ovlp"),
+        dtype=float,
+    )
+    if ao_overlap.shape != (mol.nao_nr(), mol.nao_nr()):
+        raise RuntimeError("unexpected AO-overlap shape")
+    if not np.all(np.isfinite(ao_overlap)):
+        raise RuntimeError("AO overlap must be finite")
+
+    return MolecularTDARuntime(
+        result=result,
+        molecule=mol,
+        ao_overlap=ao_overlap,
+        transition_densities_ao=tuple(transition_densities),
+    )
+
+
+def run_closed_shell_tda(
+    **kwargs,
+) -> MolecularTDAResult:
+    """Compatibility wrapper returning the public serializable result only."""
+    return run_closed_shell_tda_runtime(**kwargs).result
+
+
+def cross_geometry_ao_overlap(
+    left_runtime: MolecularTDARuntime,
+    right_runtime: MolecularTDARuntime,
+) -> np.ndarray:
+    """Return the AO overlap mapping the right geometry basis into the left."""
+    try:
+        from pyscf import gto
+    except ImportError as exc:  # pragma: no cover
+        raise RuntimeError(
+            "cross-geometry overlap requires the OES q1 extra (PySCF)"
+        ) from exc
+    overlap = np.asarray(
+        gto.intor_cross(
+            "int1e_ovlp",
+            left_runtime.molecule,
+            right_runtime.molecule,
+        ),
+        dtype=float,
+    )
+    expected = (
+        left_runtime.ao_overlap.shape[0],
+        right_runtime.ao_overlap.shape[0],
+    )
+    if overlap.shape != expected:
+        raise RuntimeError(
+            f"unexpected cross-geometry AO-overlap shape {overlap.shape}"
+        )
+    if not np.all(np.isfinite(overlap)):
+        raise RuntimeError("cross-geometry AO overlap must be finite")
+    return overlap
 
 
 def run_orientation_tda_scan(
@@ -325,8 +428,11 @@ __all__ = [
     "MolecularTDAError",
     "MolecularTDAState",
     "MolecularTDAResult",
+    "MolecularTDARuntime",
     "OrientationTDAPoint",
     "OrientationTDAScan",
+    "run_closed_shell_tda_runtime",
     "run_closed_shell_tda",
+    "cross_geometry_ao_overlap",
     "run_orientation_tda_scan",
 ]
