@@ -1,0 +1,41 @@
+name: OES T5 block spectral response
+
+on:
+  push:
+    paths:
+      - 'oes/block_response.py'
+      - 'tests/test_block_response.py'
+      - 'scripts/run_t5_necl2_block_response.py'
+      - 'formalism/OES-T5-block-spectral-response.md'
+      - '.github/workflows/oes-t5-block-response.yml'
+      - 'oes/molecular_tda.py'
+      - 'oes/tda_tracking.py'
+  pull_request:
+    paths:
+      - 'oes/block_response.py'
+      - 'tests/test_block_response.py'
+      - 'scripts/run_t5_necl2_block_response.py'
+      - 'formalism/OES-T5-block-spectral-response.md'
+      - '.github/workflows/oes-t5-block-response.yml'
+      - 'oes/molecular_tda.py'
+      - 'oes/tda_tracking.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  block-response:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install OES q1 backend
+        run: python -m pip install -e '.[q1]'
+      - name: Run T5 block response controls
+        run: python -m unittest -v tests.test_block_response
+      - name: Emit rigid NeCl2 block response receipt
+        run: python scripts/run_t5_necl2_block_response.py
