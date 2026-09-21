@@ -44,7 +44,7 @@ class OESRelationalInvariantContractTests(unittest.TestCase):
         payload = self._state([[0.0, 0.2j], [-0.2j, 0.0]]).as_dict()
         contract = payload["representation_contract"]
         self.assertEqual(contract["schema"], INVARIANT_CONTRACT_ID)
-        self.assertEqual(contract["profile"], OES_ORBITAL_REPHASING_PROFILE_ID)
+        self.assertEqual(contract["profile"], OES_ORBITAL_UNITARY_BASIS_PROFILE_ID)
 
     def test_declared_unknown_contract_fails_closed(self):
         payload = self._state([[0.0, 0.2j], [-0.2j, 0.0]]).as_dict()
