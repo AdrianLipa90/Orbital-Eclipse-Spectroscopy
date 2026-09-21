@@ -4,9 +4,12 @@ import numpy as np
 
 from oes.invariant_contract import (
     INVARIANT_CONTRACT_ID,
-    OES_ORBITAL_REPHASING_PROFILE_ID,
+    OES_ORBITAL_UNITARY_BASIS_PROFILE_ID,
     rephase_orbital_values,
     rephase_transition_rdm,
+    transform_one_body_operator,
+    transform_orbital_values,
+    transform_transition_rdm,
 )
 from oes.phase_microscope import phase_microscope_field, transition_density_on_points
 from oes.transition_contract import (
@@ -54,6 +57,42 @@ class OESRelationalInvariantContractTests(unittest.TestCase):
         payload.pop("representation_contract")
         restored = OESTransitionState.from_dict(payload)
         self.assertEqual(restored.n_spatial_orbitals, 2)
+
+
+    def test_full_unitary_orbital_basis_change_preserves_density_and_amplitude(self):
+        t = np.asarray(
+            [[0.2 + 0.1j, 0.4 - 0.3j], [-0.15 + 0.2j, 0.7 - 0.05j]],
+            dtype=complex,
+        )
+        orbitals = np.asarray(
+            [[1.0, 0.3j], [0.5 - 0.2j, 1.2], [-0.4j, 0.8 + 0.1j]],
+            dtype=complex,
+        )
+        seed = np.asarray(
+            [[1.0 + 0.2j, 0.4 - 0.7j], [-0.3 + 0.5j, 1.1 - 0.1j]],
+            dtype=complex,
+        )
+        unitary, _ = np.linalg.qr(seed)
+        operator = np.asarray(
+            [[0.8, 0.25 + 0.4j], [0.25 - 0.4j, -0.3]],
+            dtype=complex,
+        )
+
+        baseline_state = self._state(t)
+        baseline_density = transition_density_on_points(baseline_state, orbitals)
+        baseline_amplitude = baseline_state.transition_amplitude(operator)
+
+        transformed_state = self._state(transform_transition_rdm(t, unitary))
+        transformed_density = transition_density_on_points(
+            transformed_state,
+            transform_orbital_values(orbitals, unitary),
+        )
+        transformed_amplitude = transformed_state.transition_amplitude(
+            transform_one_body_operator(operator, unitary)
+        )
+
+        np.testing.assert_allclose(transformed_density, baseline_density, atol=1.0e-12)
+        self.assertLess(abs(transformed_amplitude - baseline_amplitude), 1.0e-12)
 
     def test_matched_orbital_rephasing_leaves_transition_density_invariant(self):
         t = np.asarray([[0.2, 0.4 + 0.1j], [-0.3j, 0.7]], dtype=complex)
