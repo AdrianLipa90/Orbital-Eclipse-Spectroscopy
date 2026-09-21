@@ -92,15 +92,17 @@ class MolecularTDAResult:
 class MolecularTDARuntime:
     """Runtime-only payload for cross-geometry state tracking.
 
-    transition_densities_ao uses the TDA X occupied-virtual amplitude mapped
-    into the AO basis as C_occ X C_vir^†. Its absolute scalar normalization is
-    not used for state identity; OES-T4 Gram-whitens transition-density blocks.
+    transition_densities_ao is the spin-summed singlet-TDA transition density
+    mapped into the AO basis as 2 C_occ X C_vir^†. OES cross-checks this matrix
+    against the backend length-gauge transition dipole. T4 Gram whitening makes
+    state-continuity results insensitive to the common normalization.
     """
 
     result: MolecularTDAResult
     molecule: Any
     ao_overlap: np.ndarray
     transition_densities_ao: tuple[np.ndarray, ...]
+    transition_dipole_reconstruction_deltas: tuple[float, ...]
 
 
 @dataclass(frozen=True)
@@ -321,8 +323,50 @@ def run_closed_shell_tda_runtime(
         ):
             raise RuntimeError("TDA X amplitudes must be finite")
         transition_densities.append(
-            c_occ @ x_amplitude @ c_vir.conj().T
+            2.0 * c_occ @ x_amplitude @ c_vir.conj().T
         )
+
+    charges = np.asarray(mol.atom_charges(), dtype=float)
+    coordinates_bohr = np.asarray(
+        mol.atom_coords(unit="Bohr"),
+        dtype=float,
+    )
+    nuclear_charge = float(np.sum(charges))
+    if nuclear_charge <= 0.0 or not math.isfinite(nuclear_charge):
+        raise RuntimeError("molecular nuclear charge must be positive")
+    charge_center_bohr = np.sum(
+        charges[:, None] * coordinates_bohr,
+        axis=0,
+    ) / nuclear_charge
+    with mol.with_common_orig(charge_center_bohr):
+        dipole_ao = np.asarray(
+            mol.intor_symmetric("int1e_r", comp=3),
+            dtype=complex,
+        )
+    dipole_reconstruction_deltas = []
+    for index, transition_density in enumerate(transition_densities):
+        reconstructed = np.einsum(
+            "xpq,pq->x",
+            dipole_ao,
+            transition_density,
+            optimize=True,
+        )
+        reference = np.asarray(
+            transition_dipoles[index],
+            dtype=complex,
+        )
+        delta = float(np.max(np.abs(reconstructed - reference)))
+        dipole_reconstruction_deltas.append(delta)
+        if not np.allclose(
+            reconstructed,
+            reference,
+            rtol=1.0e-10,
+            atol=1.0e-10,
+        ):
+            raise RuntimeError(
+                "AO transition density does not reproduce the PySCF "
+                "length-gauge transition dipole"
+            )
 
     ao_overlap = np.asarray(
         mol.intor_symmetric("int1e_ovlp"),
@@ -338,6 +382,9 @@ def run_closed_shell_tda_runtime(
         molecule=mol,
         ao_overlap=ao_overlap,
         transition_densities_ao=tuple(transition_densities),
+        transition_dipole_reconstruction_deltas=tuple(
+            dipole_reconstruction_deltas
+        ),
     )
 
 
