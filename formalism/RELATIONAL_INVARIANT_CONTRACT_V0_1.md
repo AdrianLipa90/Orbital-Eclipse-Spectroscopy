@@ -166,7 +166,7 @@ RC owns state generation. OES owns transition and spectroscopy inference.
 Every RC-to-OES transition packet that opts into this contract must declare:
 
 - `schema = RELATIONAL_INVARIANT_CONTRACT_V0_1`;
-- `profile = OES_ORBITAL_U1_REPHASING_V0_1`;
+- `profile = OES_ORBITAL_UNITARY_BASIS_V0_1`;
 - the exact orbital basis identifier;
 - the transition-RDM convention;
 - provenance for source repository, commit, method and backend.
