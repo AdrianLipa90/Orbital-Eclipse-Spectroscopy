@@ -1,10 +1,11 @@
-"""Phase-microscope observables reconstructed from an OES transition 1-RDM."""
+"""Phase-microscope fields reconstructed from an OES transition 1-RDM.\n\nMatched orbital rephasing leaves the transition density unchanged. A separate\nglobal phase of the initial/final state rays multiplies the whole transition\ndensity by one U(1) phase, so absolute raw phase is not an observable without\na reference; amplitude, nodes and relative phase are invariant.\n"""
 from __future__ import annotations
 
 from dataclasses import dataclass
 
 import numpy as np
 
+from .invariant_contract import relative_transition_phase
 from .transition_contract import OESTransitionState
 
 
@@ -17,6 +18,24 @@ class PhaseMicroscopeField:
 
     def reconstruct(self) -> np.ndarray:
         return self.amplitude * np.exp(1j * self.phase_rad)
+
+    def relative_phase(
+        self,
+        *,
+        reference_index: int | None = None,
+        amplitude_floor: float = 1.0e-14,
+    ) -> tuple[np.ndarray, np.ndarray, int | None]:
+        """Remove the arbitrary global initial/final state-ray phase.
+
+        Raw ``phase_rad`` is a representation-level diagnostic. Physical phase
+        claims require a declared external phase reference or a relative phase
+        returned by this method.
+        """
+        return relative_transition_phase(
+            self.transition_density,
+            amplitude_floor=amplitude_floor,
+            reference_index=reference_index,
+        )
 
 
 def transition_density_on_points(
