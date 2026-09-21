@@ -1,0 +1,33 @@
+name: OES T3 molecular TDA orientation
+
+on:
+  push:
+    paths:
+      - 'oes/molecular_tda.py'
+      - 'tests/test_molecular_tda.py'
+      - 'formalism/OES-T3-molecular-tda-orientation.md'
+      - '.github/workflows/oes-t3-molecular-tda.yml'
+  pull_request:
+    paths:
+      - 'oes/molecular_tda.py'
+      - 'tests/test_molecular_tda.py'
+      - 'formalism/OES-T3-molecular-tda-orientation.md'
+      - '.github/workflows/oes-t3-molecular-tda.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  molecular-tda:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install OES q1 backend
+        run: python -m pip install -e '.[q1]'
+      - name: Run molecular TDA orientation gate
+        run: python -m unittest -v tests.test_molecular_tda
