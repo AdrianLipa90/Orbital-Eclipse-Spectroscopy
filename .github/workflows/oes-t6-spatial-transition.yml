@@ -1,0 +1,43 @@
+name: OES T6 spatial transition cancellation
+
+on:
+  push:
+    paths:
+      - 'oes/molecular_tda.py'
+      - 'oes/spatial_transition_density.py'
+      - 'tests/test_spatial_transition_density.py'
+      - 'tests/test_spatial_transition_density_pyscf.py'
+      - 'scripts/run_t6_necl2_spatial.py'
+      - 'formalism/OES-T6-spatial-transition-cancellation.md'
+      - '.github/workflows/oes-t6-spatial-transition.yml'
+  pull_request:
+    paths:
+      - 'oes/molecular_tda.py'
+      - 'oes/spatial_transition_density.py'
+      - 'tests/test_spatial_transition_density.py'
+      - 'tests/test_spatial_transition_density_pyscf.py'
+      - 'scripts/run_t6_necl2_spatial.py'
+      - 'formalism/OES-T6-spatial-transition-cancellation.md'
+      - '.github/workflows/oes-t6-spatial-transition.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  spatial-transition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install OES q1 backend
+        run: python -m pip install -e '.[q1]'
+      - name: Run T6 invariant controls
+        run: python -m unittest -v tests.test_spatial_transition_density
+      - name: Run T6 PySCF grid controls
+        run: python -m unittest -v tests.test_spatial_transition_density_pyscf
+      - name: Emit rigid NeCl2 spatial cancellation receipt
+        run: python scripts/run_t6_necl2_spatial.py
