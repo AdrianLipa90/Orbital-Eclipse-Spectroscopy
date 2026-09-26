@@ -2,7 +2,7 @@
   "schema": "MONTGOMERY_DYSON_PHASE_SPECTROSCOPY_V0_1",
   "repository": "AdrianLipa90/Orbital-Eclipse-Spectroscopy",
   "domain_role": "OES_TRANSITION_LAYER",
-  "status": "CANDIDATE_IMPLEMENTED_LOCAL_REFERENCE_TESTS_PASS",
+  "status": "CORE_FORCED_PREDICTION__OES_BINDING_CANDIDATE",
   "base_branch": "main",
   "base_sha": "20957d9eafce27497e948c69cfc87dc9ef705e91",
   "branch": "candidate/montgomery-dyson-phase-spectroscopy-v0.1-20260926",
@@ -19,5 +19,15 @@
     "promotion_requires_repo_validation": true
   },
   "reverse_control": "preserve prime-power frequencies and amplitudes; randomize phases",
-  "canon_allowed": false
+  "canon_allowed": false,
+  "forced_prediction_dependency": {
+    "repository": "AdrianLipa90/Infinities",
+    "branch": "formalize/hardy-car-sine-kernel-forced-prediction-v0.1-20260926",
+    "head": "7008a9121d878674a7190d0966faa727f9eacb55",
+    "claim": "INF-270"
+  },
+  "status_split": {
+    "phase_correlation_core": "DERIVED_IN_FRAMEWORK_FORCED_PREDICTION",
+    "oes_domain_binding": "CANDIDATE_NOT_PROMOTED"
+  }
 }
