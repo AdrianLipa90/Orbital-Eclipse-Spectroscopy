@@ -1,0 +1,23 @@
+{
+  "schema": "MONTGOMERY_DYSON_PHASE_SPECTROSCOPY_V0_1",
+  "repository": "AdrianLipa90/Orbital-Eclipse-Spectroscopy",
+  "domain_role": "OES_TRANSITION_LAYER",
+  "status": "CANDIDATE_IMPLEMENTED_LOCAL_REFERENCE_TESTS_PASS",
+  "base_branch": "main",
+  "base_sha": "20957d9eafce27497e948c69cfc87dc9ef705e91",
+  "branch": "candidate/montgomery-dyson-phase-spectroscopy-v0.1-20260926",
+  "date": "2026-09-26",
+  "local_reference_tests": {
+    "status": "PASS",
+    "count": 6,
+    "scope": "isolated module-equivalent smoke/regression; not repository CI"
+  },
+  "claim_boundaries": {
+    "proves_riemann_hypothesis": false,
+    "asserts_prime_generated_atomic_spectra": false,
+    "changes_oes_physical_solver": false,
+    "promotion_requires_repo_validation": true
+  },
+  "reverse_control": "preserve prime-power frequencies and amplitudes; randomize phases",
+  "canon_allowed": false
+}
