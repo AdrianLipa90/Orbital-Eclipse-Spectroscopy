@@ -71,3 +71,38 @@ Implementation distinction:
 - \`forced_form_factor_target\` returns the forced ramp/plateau \(\min(|\tau|,1)\).
 
 The core target is DERIVED_IN_FRAMEWORK / FORCED_PREDICTION. Whether the OES transition spectrum instantiates the shared consecutive-projector/CAR sector remains a separate domain-binding test.
+
+
+## Arithmetic validation envelope
+
+The shared arithmetic phase-spectroscopy stack now separates four levels:
+
+1. **Forced projector core**
+   \[
+   g_2(s)=1-\left(\frac{\sin\pi s}{\pi s}\right)^2,
+   \qquad
+   S(\tau)=\min(|\tau|,1).
+   \]
+
+2. **Exact prime-power frequency coordinate**
+   \[
+   \tau_{p^m}(T)
+   =
+   \frac{m\log p}{\log(T/2\pi)}.
+   \]
+
+3. **Exact window bridge**
+   \[
+   G_v(t)=e^{t/2}v(e^t)
+   \]
+   converts a smooth additive arithmetic window into the standard logarithmic \(n^{-1/2}\) explicit-formula normalization, and translation averaging produces the exact positive-definite shift autocorrelation kernel.
+
+4. **Arithmetic validation range**
+   After Fejér shift averaging, the Möbius--CRT low-divisor block is asymptotically closed. Combined with the standard unconditional Saffari--Vaughan short-interval mean-square theorem, the averaged high-divisor tail is \(o(X)\) in the classical long-window range
+   \[
+   X^{1/6+\varepsilon}
+   \le H+1\le X^{1-\delta}.
+   \]
+   A deeper polylogarithmic validation envelope is available only **conditionally on RH** and is explicitly barred as an RH-proof premise.
+
+These arithmetic statements validate the mathematical spectroscopy pipeline. They do **not** establish that the OES transition spectrum realizes the Hardy--CAR projector process. That remains the domain-binding question.
