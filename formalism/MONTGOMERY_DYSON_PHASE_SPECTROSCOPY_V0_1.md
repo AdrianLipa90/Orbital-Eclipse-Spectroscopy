@@ -47,3 +47,27 @@ and
 g2(s) = 1 - [sin(pi s)/(pi s)]^2.
 
 The OES-specific open question is whether a given atomic or molecular transition ensemble instantiates that projector sector. That binding remains candidate and must be tested independently.
+
+
+## Forced dual form-factor target
+
+The phase-correlation core now carries both members of the same forced Hardy--CAR spectral law:
+
+\[
+g_2(\Delta\Phi)
+=
+1-
+\left[
+\frac{\sin(\Delta\Phi/2)}
+{\Delta\Phi/2}
+\right]^2,
+\qquad
+S(\tau)=\min(|\tau|,1).
+\]
+
+Implementation distinction:
+- \`spectral_form_factor\` remains the backward-compatible raw coherence \(|\langle e^{i\tau\Phi}\rangle|^2\);
+- \`normalized_spectral_form_factor\` returns \(N|\langle e^{i\tau\Phi}\rangle|^2\), the finite pair-power normalization;
+- \`forced_form_factor_target\` returns the forced ramp/plateau \(\min(|\tau|,1)\).
+
+The core target is DERIVED_IN_FRAMEWORK / FORCED_PREDICTION. Whether the OES transition spectrum instantiates the shared consecutive-projector/CAR sector remains a separate domain-binding test.
