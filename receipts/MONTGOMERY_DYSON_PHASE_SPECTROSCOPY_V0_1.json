@@ -41,5 +41,20 @@
     "raw": "|mean exp(i tau Phi)|^2",
     "normalized": "N*|mean exp(i tau Phi)|^2",
     "forced_target": "min(|tau|,1)"
+  },
+  "arithmetic_validation_dependency": {
+    "repository": "AdrianLipa90/On-Primes",
+    "branch": "integrate/fejer-averaged-mobius-crt-low-block-v0.1-20260926",
+    "status_split": {
+      "forced_projector_core": "DERIVED_IN_FRAMEWORK_FORCED_PREDICTION",
+      "prime_power_frequency_map": "EXACT_FINITE_IDENTITY",
+      "explicit_formula_window_bridge": "EXACT",
+      "fejer_low_block": "PROVED_FROM_STANDARD",
+      "averaged_high_tail_long_window": "PROVED_FROM_STANDARD_UNCONDITIONAL_RANGE",
+      "rh_conditional_short_window": "VALIDATION_ONLY_NOT_PROOF_INPUT",
+      "physical_domain_binding": "CANDIDATE_NOT_PROMOTED"
+    },
+    "unconditional_range": "X^(1/6+epsilon) <= H+1 <= X^(1-delta)",
+    "firewall": "Arithmetic spectral consistency does not imply physical realization in this domain."
   }
 }
