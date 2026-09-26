@@ -29,5 +29,17 @@
   "status_split": {
     "phase_correlation_core": "DERIVED_IN_FRAMEWORK_FORCED_PREDICTION",
     "oes_domain_binding": "CANDIDATE_NOT_PROMOTED"
+  },
+  "forced_form_factor_dependency": {
+    "repository": "AdrianLipa90/Infinities",
+    "branch": "formalize/hardy-car-sine-kernel-forced-prediction-v0.1-20260926",
+    "head": "4899c0c2ad8f4a38561a612c0eda8b48e9f529d3",
+    "claim": "INF-276",
+    "target": "S(tau)=min(|tau|,1)"
+  },
+  "form_factor_normalization": {
+    "raw": "|mean exp(i tau Phi)|^2",
+    "normalized": "N*|mean exp(i tau Phi)|^2",
+    "forced_target": "min(|tau|,1)"
   }
 }
