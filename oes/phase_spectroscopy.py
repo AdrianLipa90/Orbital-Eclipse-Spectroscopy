@@ -47,17 +47,36 @@ def riemann_zero_phase_coordinates(gamma: Iterable[float]) -> np.ndarray:
     return TAU * riemann_von_mangoldt_smooth_count(g)
 
 
-def gue_pair_correlation_phase(delta_phi):
+def forced_pair_correlation_phase(delta_phi):
+    """Hardy--CAR forced sinc-square pair law in phase coordinates."""
     d = np.asarray(delta_phi, dtype=float)
     if not np.all(np.isfinite(d)):
         raise ValueError("delta_phi must be finite")
     return 1.0 - np.sinc(d / TAU) ** 2
 
 
+def gue_pair_correlation_phase(delta_phi):
+    """Backward-compatible external-name alias for the forced pair law."""
+    return forced_pair_correlation_phase(delta_phi)
+
+
 def spectral_form_factor(phases: Iterable[float], modes: Iterable[float]) -> np.ndarray:
+    """Raw phase coherence |mean exp(i*tau*Phi)|^2."""
     p = _finite_1d(phases)
     m = _finite_1d(modes)
     return np.abs(np.mean(np.exp(1j * np.outer(m, p)), axis=1)) ** 2
+
+
+def normalized_spectral_form_factor(phases: Iterable[float], modes: Iterable[float]) -> np.ndarray:
+    """Finite pair-power normalization N*|mean exp(i*tau*Phi)|^2."""
+    p = _finite_1d(phases)
+    return p.size * spectral_form_factor(p, modes)
+
+
+def forced_form_factor_target(modes: Iterable[float]) -> np.ndarray:
+    """Hardy--CAR forced microscopic ramp/plateau S(tau)=min(|tau|,1)."""
+    m = _finite_1d(modes)
+    return np.minimum(np.abs(m), 1.0)
 
 
 def _primes_up_to(limit: int) -> list[int]:
